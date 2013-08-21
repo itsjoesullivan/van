@@ -133,11 +133,11 @@ var OPTIONS = {
 
     __package.json__
     
-        ```json
-        "bin": {
-          "{commandName}": "bin/{fileName}"
-        }
-        ```
+    ```json
+    "bin": {
+      "{commandName}": "bin/{fileName}"
+    }
+    ```
     
     The [npm docs](https://npmjs.org/doc/json.html#bin) don't disagree.
 
@@ -145,22 +145,25 @@ var OPTIONS = {
 
     __bin/{fileName}__
 
-        ```bash
-        #!/usr/bin/env node
-        var program = require('commander');
-        program.parse(process.argv);
-        ```
+    ```bash
+    #!/usr/bin/env node
+    var program = require('commander');
+    program.parse(process.argv);
+    ```
 
 3. The script can require files from its package using paths relative to itself
 
     __bin/{fileName}__
 
-        ```bash
-        #!/usr/bin/env node
-        var tool = require('../lib/tool');
-        ```
+    ```bash
+    #!/usr/bin/env node
+    var tool = require('../lib/tool');
+    ```
 
 4. To easily surface usage/help messages, simply write then as .txt files à la browserify:
+    
+    __bin/{fileName}__
+
     ```bash
     #!/usr/bin/env node
       return fs.createReadStream(__dirname + '/advanced.txt')

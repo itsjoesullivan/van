@@ -85,29 +85,24 @@ var OPTIONS = {
 <ol>
 <li><p>The common method of creating a global command is to define it in <code>package.json</code> like so:</p>
 <p> <strong>package.json</strong></p>
-<pre><code> ```json
- &quot;bin&quot;: {
+<pre><code class="lang-json"> &quot;bin&quot;: {
    &quot;{commandName}&quot;: &quot;bin/{fileName}&quot;
- }
- ```</code></pre>
+ }</code></pre>
 <p> The <a href="https://npmjs.org/doc/json.html#bin">npm docs</a> don&#39;t disagree.</p>
 </li>
 <li><p>That script then does the CLI-oriented stuff</p>
 <p> <strong>bin/{fileName}</strong></p>
-<pre><code> ```bash
- #!/usr/bin/env node
+<pre><code class="lang-bash"> #!/usr/bin/env node
  var program = require(&#39;commander&#39;);
- program.parse(process.argv);
- ```</code></pre>
+ program.parse(process.argv);</code></pre>
 </li>
 <li><p>The script can require files from its package using paths relative to itself</p>
 <p> <strong>bin/{fileName}</strong></p>
-<pre><code> ```bash
- #!/usr/bin/env node
- var tool = require(&#39;../lib/tool&#39;);
- ```</code></pre>
+<pre><code class="lang-bash"> #!/usr/bin/env node
+ var tool = require(&#39;../lib/tool&#39;);</code></pre>
 </li>
 <li><p>To easily surface usage/help messages, simply write then as .txt files à la browserify:</p>
+<p> <strong>bin/{fileName}</strong></p>
 <pre><code class="lang-bash"> #!/usr/bin/env node
    return fs.createReadStream(__dirname + &#39;/advanced.txt&#39;)
      .pipe(process.stdout)
