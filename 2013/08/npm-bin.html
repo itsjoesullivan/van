@@ -83,21 +83,23 @@ var OPTIONS = {
     //[...]</code></pre>
 <h1>Wrapup</h1>
 <ol>
-<li>The common method of creating a global command is to define it in <code>package.json</code> like so:</li>
-</ol>
-<p><strong>package.json</strong></p>
-<pre><code class="lang-json">&quot;bin&quot;: {
-  &quot;{commandName}&quot;: &quot;bin/{fileName}&quot;
-}</code></pre>
-<p>The <a href="https://npmjs.org/doc/json.html#bin">npm docs</a> don&#39;t disagree.</p>
-<ol>
-<li>That script then does the CLI-oriented stuff</li>
-</ol>
-<p><strong>bin/{fileName}</strong></p>
-<pre><code class="lang-bash">#!/usr/bin/env node
-var program = require(&#39;commander&#39;);
-program.parse(process.argv);</code></pre>
-<ol>
+<li><p>The common method of creating a global command is to define it in <code>package.json</code> like so:</p>
+<p> <strong>package.json</strong></p>
+<pre><code> ```json
+ &quot;bin&quot;: {
+   &quot;{commandName}&quot;: &quot;bin/{fileName}&quot;
+ }
+ ```</code></pre>
+<p> The <a href="https://npmjs.org/doc/json.html#bin">npm docs</a> don&#39;t disagree.</p>
+</li>
+<li><p>That script then does the CLI-oriented stuff</p>
+<p> <strong>bin/{fileName}</strong></p>
+<pre><code> ```bash
+ #!/usr/bin/env node
+ var program = require(&#39;commander&#39;);
+ program.parse(process.argv);
+ ```</code></pre>
+</li>
 <li><p>The script can require files from its package using paths relative to itself</p>
 <p> <strong>bin/{fileName}</strong></p>
 <pre><code> ```bash
