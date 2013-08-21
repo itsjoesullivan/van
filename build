@@ -1,0 +1,11 @@
+marked -i 2013/08/npm-bin.md -o /tmp/mark
+cat template/start.html > 2013/08/npm-bin.html
+cat /tmp/mark >> 2013/08/npm-bin.html
+rm /tmp/mark
+cat template/end.html >> 2013/08/npm-bin.html
+
+marked -i index.md -o /tmp/mark
+cat template/start.html > index.html
+cat /tmp/mark >> index.html
+rm /tmp/mark
+cat template/end.html >> index.html
