@@ -1,6 +1,6 @@
 #Defining binaries in NPM
 
-I've never quite known how to properly create global apps. A brief survey of how other people have done so follows.
+I've never quite known how to properly create global apps. A brief survey of how other people have done so follows, then a wrapup.
 
 ##Express
 
@@ -15,12 +15,12 @@ The meat of the app exists in <code>./bin/express</code>, which freely requires 
 
 ###./bin/express"
 ```bash
+
 #!/usr/bin/env node
 # [...]
 ```
 
 ##Grunt
-
 Uses precisely the same pattern as express
 ###[package.json](https://github.com/gruntjs/grunt-cli/blob/master/package.json)
 ```json
@@ -82,6 +82,7 @@ Standard.
 #!/usr/bin/env node
 
 [...]
+```
 
 ##[browserify](https://github.com/substack/node-browserify)
 
@@ -125,4 +126,36 @@ require("../src/cli.js").interpret(process.argv);
 var OPTIONS = {
     "config": ["c", "Custom configuration file", "string", false ],
     //[...]
+```
+
+#Wrapup
+
+- The common method of creating a global command is to define it in <code>package.json</code> like so:
+###package.json
+```json
+"bin": {
+  "{commandName}": "bin/{fileName}"
+}
+```
+- That script then does the CLI-oriented stuff
+###bin/{fileName}
+```bash
+#!/usr/bin/env node
+var program = require('commander');
+program.parse(process.argv);
+```
+- The script can require files from its package using paths relative to itself
+```bash
+#!/usr/bin/env node
+var tool = require('../lib/tool');
+```
+
+- To easily customize your usage/help messages, simply write then as .txt files à la browserify:
+
+```bash
+#!/usr/bin/env node
+  return fs.createReadStream(__dirname + '/advanced.txt')
+    .pipe(process.stdout)
+    .on('close', function () { process.exit(1) })
+  ;
 ```
