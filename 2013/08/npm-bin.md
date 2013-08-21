@@ -83,7 +83,7 @@ Standard.
 [...]
 ```
 
-##[browserify](https://github.com/substack/node-browserify)
+##browserify
 
 Similar invocation, with an interesting twist: help files are stored in <code>bin/usage.txt</code> and <code>bin/advanced.txt</code>, offering a pretty neat way to manage usage if not using commanderjs.
 
@@ -101,7 +101,7 @@ var fs = require('fs');
 [...]
 ```
 
-##[jshint](https://github.com/jshint/jshint/blob/master/bin/jshint)
+##jshint
 
 jshint is the first on this list that has a one-liner bash script. Still, it invokes <code>../src/cli.js</code>.
 
@@ -127,7 +127,7 @@ var OPTIONS = {
     //[...]
 ```
 
-#Wrapup
+##Wrapup
 
 1. The common method of creating a global command is to define it in <code>package.json</code> like so:
 
