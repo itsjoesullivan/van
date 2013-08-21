@@ -130,7 +130,7 @@ var OPTIONS = {
 
 #Wrapup
 
-- The common method of creating a global command is to define it in <code>package.json</code> like so:
+1. The common method of creating a global command is to define it in <code>package.json</code> like so:
 
 __package.json__
 
@@ -140,7 +140,7 @@ __package.json__
 }
 ```
 
-- That script then does the CLI-oriented stuff
+2. That script then does the CLI-oriented stuff
 
 __bin/{fileName}__
 ```bash
@@ -149,7 +149,7 @@ var program = require('commander');
 program.parse(process.argv);
 ```
 
-- The script can require files from its package using paths relative to itself
+3. The script can require files from its package using paths relative to itself
 
 __bin/{fileName}__
 ```bash
@@ -157,7 +157,7 @@ __bin/{fileName}__
 var tool = require('../lib/tool');
 ```
 
-- To easily surface usage/help messages, simply write then as .txt files à la browserify:
+4. To easily surface usage/help messages, simply write then as .txt files à la browserify:
 
 ```bash
 #!/usr/bin/env node
