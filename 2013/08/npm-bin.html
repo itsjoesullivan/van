@@ -5,8 +5,7 @@
 </head>
 <body>
 <h1>Defining binaries in NPM</h1>
-<p>I&#39;ve never quite known the proper way to declare a global script within an npm module.</p>
-<p>I conducted a brief survey of the most starred CLI npm modules. It&#39;s below, followed by a brief <a href="#wrapup">wrapup</a>.</p>
+<p>I&#39;ve never quite known the proper way to declare a global script within an npm module. The <a href="https://npmjs.org/doc/json.html#bin">docs</a> aren&#39;t exactly hazy, but I conducted a little survey, below, to grok the overall practice.  A brief <a href="#wrapup">wrapup</a> follows.</p>
 <h2>Express</h2>
 <p>The meat of the app exists in <code>./bin/express</code>, which freely requires scripts with paths relative to itself.</p>
 <h3><a href="https://github.com/visionmedia/express/blob/master/package.json">package.json</a></h3>

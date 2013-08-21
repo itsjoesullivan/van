@@ -1,8 +1,6 @@
 #Defining binaries in NPM
 
-I've never quite known the proper way to declare a global script within an npm module.
-
-I conducted a brief survey of the most starred CLI npm modules. It's below, followed by a brief [wrapup](#wrapup).
+I've never quite known the proper way to declare a global script within an npm module. The [docs](https://npmjs.org/doc/json.html#bin) aren't exactly hazy, but I conducted a little survey, below, to grok the overall practice.  A brief [wrapup](#wrapup) follows.
 
 ##Express
 
