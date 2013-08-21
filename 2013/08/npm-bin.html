@@ -1,0 +1,106 @@
+<h1>Defining binaries in NPM</h1>
+<p>I&#39;ve never quite known the proper way to declare a global script within an npm module. I conducted a brief survey of the most starred CLI npm modules. It&#39;s below, followed by a brief <a href="#wrapup">wrapup</a>.</p>
+<h2>Express</h2>
+<p>The meat of the app exists in <code>./bin/express</code>, which freely requires scripts with paths relative to itself.</p>
+<h3><a href="https://github.com/visionmedia/express/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json">&quot;bin&quot;: {
+  &quot;express&quot;: &quot;./bin/express&quot;
+}</code></pre>
+<h3><a href="https://github.com/visionmedia/express/blob/master/bin/express">./bin/express&quot;</a></h3>
+<pre><code class="lang-bash">#!/usr/bin/env node
+# [...]</code></pre>
+<h2>Grunt</h2>
+<p>Uses precisely the same pattern as express</p>
+<h3><a href="https://github.com/gruntjs/grunt-cli/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json">&quot;bin&quot;: {
+    &quot;grunt&quot;: &quot;bin/grunt&quot;
+}</code></pre>
+<h3><a href="https://github.com/gruntjs/grunt-cli/blob/master/bin/grunt">bin/grunt</a></h3>
+<pre><code class="lang-bash">#!/usr/bin/env node
+# [...]</code></pre>
+<h2>mocha</h2>
+<p>Mocha mixes things up a bit. &quot;mocha&quot; does little but execute &quot;node ./_mocha&quot;, except when certain commands would modify node instead of mocha, i.e. &quot;node debug _mocha&quot;. <a href="https://github.com/visionmedia/mocha/compare/221a3c049ed3a943ce36fd0a4ffe0e23acbb7cab...6fa9d8ae889a">It wasn&#39;t always that way</a>.</p>
+<h3><a href="https://github.com/visionmedia/mocha/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json">  &quot;bin&quot;: {
+    &quot;mocha&quot;: &quot;./bin/mocha&quot;,
+      &quot;_mocha&quot;: &quot;./bin/_mocha&quot;
+  }</code></pre>
+<h3><a href="https://github.com/visionmedia/mocha/blob/master/bin/mocha">./bin/mocha</a></h3>
+<pre><code class="lang-bash">#!/usr/bin/env node
+/**
+ * This tiny wrapper file checks for known node flags and appends them
+ * when found, before invoking the &quot;real&quot; _mocha(1) executable.
+ */
+// [...]
+args = [ __dirname + &#39;/_mocha&#39; ]
+/* [building some arguments] */</code></pre>
+<h3><a href="https://github.com/visionmedia/mocha/blob/master/bin/_mocha">./bin/_mocha</a></h3>
+<pre><code class="lang-bash">#!/usr/bin/env node
+
+/** [familiar..]
+ * Module dependencies.
+ */</code></pre>
+<h2>UglifyJS</h2>
+<p>Standard.</p>
+<h3><a href="https://github.com/mishoo/UglifyJS/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json">&quot;bin&quot;     : {
+  &quot;uglifyjs&quot; : &quot;./bin/uglifyjs&quot;
+}</code></pre>
+<h3><a href="https://github.com/mishoo/UglifyJS/blob/master/bin/uglifyjs">./bin/uglifyjs</a></h3>
+<pre><code class="lang-bash">#!/usr/bin/env node
+
+[...]</code></pre>
+<h2><a href="https://github.com/substack/node-browserify">browserify</a></h2>
+<p>Similar invocation, with an interesting twist: help files are stored in <code>bin/usage.txt</code> and <code>bin/advanced.txt</code>, offering a pretty neat way to manage usage if not using commanderjs.</p>
+<h3>package.json</h3>
+<pre><code class="lang-json">&quot;bin&quot;: {
+  &quot;browserify&quot;: &quot;bin/cmd.js&quot;
+}</code></pre>
+<h3><a href="https://github.com/substack/node-browserify/blob/master/bin/cmd.js">bin/cmd.js</a></h3>
+<pre><code class="lang-bash">#!/usr/bin/env node
+var fs = require(&#39;fs&#39;);
+[...]</code></pre>
+<h2><a href="https://github.com/jshint/jshint/blob/master/bin/jshint">jshint</a></h2>
+<p>jshint is the first on this list that has a one-liner bash script. Still, it invokes <code>../src/cli.js</code>.</p>
+<h3><a href="https://github.com/jshint/jshint/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json">&quot;bin&quot;: {
+  &quot;jshint&quot;: &quot;./bin/jshint&quot;
+}</code></pre>
+<h3><a href="https://github.com/jshint/jshint/blob/master/bin/jshint">./bin/jshint</a></h3>
+<pre><code class="lang-bash">#!/usr/bin/env node
+
+require(&quot;../src/cli.js&quot;).interpret(process.argv);</code></pre>
+<h3><a href="https://github.com/jshint/jshint/blob/master/src/cli.js">../src/cli.js</a></h3>
+<pre><code class="lang-javascript">// [...]
+var OPTIONS = {
+    &quot;config&quot;: [&quot;c&quot;, &quot;Custom configuration file&quot;, &quot;string&quot;, false ],
+    //[...]</code></pre>
+<h1>Wrapup</h1>
+<ul>
+<li>The common method of creating a global command is to define it in <code>package.json</code> like so:</li>
+</ul>
+<p><strong>package.json</strong></p>
+<pre><code class="lang-json">&quot;bin&quot;: {
+  &quot;{commandName}&quot;: &quot;bin/{fileName}&quot;
+}</code></pre>
+<ul>
+<li>That script then does the CLI-oriented stuff</li>
+</ul>
+<p><strong>bin/{fileName}</strong></p>
+<pre><code class="lang-bash">#!/usr/bin/env node
+var program = require(&#39;commander&#39;);
+program.parse(process.argv);</code></pre>
+<ul>
+<li>The script can require files from its package using paths relative to itself</li>
+</ul>
+<p><strong>bin/{fileName}</strong></p>
+<pre><code class="lang-bash">#!/usr/bin/env node
+var tool = require(&#39;../lib/tool&#39;);</code></pre>
+<ul>
+<li>To easily surface usage/help messages, simply write then as .txt files à la browserify:</li>
+</ul>
+<pre><code class="lang-bash">#!/usr/bin/env node
+  return fs.createReadStream(__dirname + &#39;/advanced.txt&#39;)
+    .pipe(process.stdout)
+    .on(&#39;close&#39;, function () { process.exit(1) })
+  ;</code></pre>
