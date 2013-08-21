@@ -56,7 +56,7 @@ args = [ __dirname + &#39;/_mocha&#39; ]
 <pre><code class="lang-bash">#!/usr/bin/env node
 
 [...]</code></pre>
-<h2><a href="https://github.com/substack/node-browserify">browserify</a></h2>
+<h2>browserify</h2>
 <p>Similar invocation, with an interesting twist: help files are stored in <code>bin/usage.txt</code> and <code>bin/advanced.txt</code>, offering a pretty neat way to manage usage if not using commanderjs.</p>
 <h3>package.json</h3>
 <pre><code class="lang-json">&quot;bin&quot;: {
@@ -66,7 +66,7 @@ args = [ __dirname + &#39;/_mocha&#39; ]
 <pre><code class="lang-bash">#!/usr/bin/env node
 var fs = require(&#39;fs&#39;);
 [...]</code></pre>
-<h2><a href="https://github.com/jshint/jshint/blob/master/bin/jshint">jshint</a></h2>
+<h2>jshint</h2>
 <p>jshint is the first on this list that has a one-liner bash script. Still, it invokes <code>../src/cli.js</code>.</p>
 <h3><a href="https://github.com/jshint/jshint/blob/master/package.json">package.json</a></h3>
 <pre><code class="lang-json">&quot;bin&quot;: {
@@ -81,7 +81,7 @@ require(&quot;../src/cli.js&quot;).interpret(process.argv);</code></pre>
 var OPTIONS = {
     &quot;config&quot;: [&quot;c&quot;, &quot;Custom configuration file&quot;, &quot;string&quot;, false ],
     //[...]</code></pre>
-<h1>Wrapup</h1>
+<h2>Wrapup</h2>
 <ol>
 <li><p>The common method of creating a global command is to define it in <code>package.json</code> like so:</p>
 <p> <strong>package.json</strong></p>
