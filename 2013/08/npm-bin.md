@@ -1,6 +1,7 @@
 #Defining binaries in NPM
 
-I've never quite known how to properly create global apps. A brief survey of how other people have done so follows, then a wrapup.
+I've never quite known the proper way to declare a global script within an npm module. I conducted a brief survey of the most starred CLI npm modules. It's below, followed by a brief [wrapup](#wrapup).
+
 
 ##Express
 
