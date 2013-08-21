@@ -6,16 +6,15 @@ I've never quite known how to properly create global apps. A brief survey of how
 
 The meat of the app exists in <code>./bin/express</code>, which freely requires scripts with paths relative to itself.
 
-###package.json
+###[package.json](https://github.com/visionmedia/express/blob/master/package.json)
 ```json
 "bin": {
   "express": "./bin/express"
 }
 ```
 
-###./bin/express"
+###[./bin/express"](https://github.com/visionmedia/express/blob/master/bin/express)
 ```bash
-
 #!/usr/bin/env node
 # [...]
 ```
@@ -38,7 +37,7 @@ Uses precisely the same pattern as express
 ##mocha
 Mocha mixes things up a bit. "mocha" does little but execute "node ./_mocha", except when certain commands would modify node instead of mocha, i.e. "node debug _mocha". [It wasn't always that way](https://github.com/visionmedia/mocha/compare/221a3c049ed3a943ce36fd0a4ffe0e23acbb7cab...6fa9d8ae889a).
 
-###package.json
+###[package.json](https://github.com/visionmedia/mocha/blob/master/package.json)
 ```json
   "bin": {
     "mocha": "./bin/mocha",
@@ -132,7 +131,7 @@ var OPTIONS = {
 
 - The common method of creating a global command is to define it in <code>package.json</code> like so:
 
-###package.json
+__package.json__
 
 ```json
 "bin": {
@@ -142,7 +141,7 @@ var OPTIONS = {
 
 - That script then does the CLI-oriented stuff
 
-###bin/{fileName}
+__bin/{fileName}__
 ```bash
 #!/usr/bin/env node
 var program = require('commander');
@@ -150,6 +149,8 @@ program.parse(process.argv);
 ```
 
 - The script can require files from its package using paths relative to itself
+
+__bin/{fileName}__
 ```bash
 #!/usr/bin/env node
 var tool = require('../lib/tool');
