@@ -1,3 +1,5 @@
+<link rel="chrome-webstore-item"
+href="https://chrome.google.com/webstore/detail/ilikdighfoieecgeiffoekahmpjoekii" />
 #[doctor](https://chrome.google.com/webstore/detail/doctor/ilikdighfoieecgeiffoekahmpjoekii)
 On-the-fly docco document generation.
 
@@ -12,6 +14,7 @@ high-quality externally-facing documentaton, and documentation as an internal
 development tool is a much sorrier state of affairs.
 
 The two biggest areas of friction in documentation writing are:
+
 1. No one wants to write documentation
 2. No one wants extra build steps
 
@@ -36,5 +39,12 @@ As soon as you browse to a piece of Docco-friendly source code __doctor__ kicks
 into gear, parses out the markdown, and renders the page as the html file docco
 _would_ have spit out.
 
-
-[doctor](https://chrome.google.com/webstore/detail/doctor/ilikdighfoieecgeiffoekahmpjoekii)
+<button><a
+href="https://chrome.google.com/webstore/detail/doctor/ilikdighfoieecgeiffoekahmpjoekii">install
+it</button>
+<script>
+if(navigator.userAgent.indexOf('Chrome') > -1) {
+  document.getElementsByTagName('button')[0].addEventListener('click',
+  chrome.webstore.install);
+}
+</script>
