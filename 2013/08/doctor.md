@@ -37,11 +37,3 @@ As soon as you browse to a piece of Docco-friendly source code __doctor__ kicks
 into gear, parses out the markdown, and renders the page as the html file docco
 _would_ have spit out.
 
-<button>Install doctor</button>
-<script>
-if(navigator.userAgent.indexOf('Chrome') > -1) {
-  document.getElementsByTagName('button')[0].addEventListener('click',
-  function() {
-    chrome.webstore.install('https://chrome.google.com/webstore/detail/ilikdighfoieecgeiffoekahmpjoekii'); });
-}
-</script>
