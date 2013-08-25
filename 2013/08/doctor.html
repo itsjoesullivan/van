@@ -9,10 +9,27 @@
 <h2>tl;dr</h2>
 <p>Install this Chrome extension to automatically parse docco-style source code
 when it&#39;s on the screen--i.e. when visiting a page like
-<a href="https://raw.github.com/jashkenas/backbone/master/backbone.js">this</a></p>
+<a href="https://raw.github.com/jashkenas/backbone/master/backbone.js">this</a>.</p>
 <p>Documentation solutions are not what they could be. Few projects have very
 high-quality externally-facing documentaton, and documentation as an internal
-development tool is a much more sorry state of affairs.</p>
-<p> <a href="https://chrome.google.com/webstore/detail/doctor/ilikdighfoieecgeiffoekahmpjoekii">doctor</a></p>
+development tool is a much sorrier state of affairs.</p>
+<p>The two biggest areas of friction in documentation writing are:
+1. No one wants to write documentation
+2. No one wants extra build steps</p>
+<h2>Enter Docco</h2>
+<p><em>No one wants to write documentation</em></p>
+<p><a href="http://jashkenas.github.io/docco/">Docco</a> is an excellent documentation tool:
+write markdown in comments in your code, run it through Docco, and you&#39;ve got a
+directory of html containing a good-looking view of that code and its documentation. 
+This lets you write your code and documentation together.</p>
+<p>But what to do with that directory? Particularly if this is <em>internal</em>
+documentation, shoving it in your app&#39;s public static folder isn&#39;t gonna happen.</p>
+<h2>Enter Doctor</h2>
+<p><em>No one wants extra build steps</em></p>
+<p>Doctor lets you skip that build step by shoving Docco into the browser. 
+As soon as you browse to a piece of Docco-friendly source code <strong>doctor</strong> kicks
+into gear, parses out the markdown, and renders the page as the html file docco
+<em>would</em> have spit out.</p>
+<p><a href="https://chrome.google.com/webstore/detail/doctor/ilikdighfoieecgeiffoekahmpjoekii">doctor</a></p>
 </body>
 </html>
