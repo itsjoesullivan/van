@@ -43,6 +43,6 @@ _would_ have spit out.
 <script>
 if(navigator.userAgent.indexOf('Chrome') > -1) {
   document.getElementsByTagName('button')[0].addEventListener('click',
-  chrome.webstore.install);
+  function() { chrome.webstore.install(); });
 }
 </script>
