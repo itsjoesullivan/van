@@ -1,6 +1,4 @@
-<link rel="chrome-webstore-item"
-href="https://chrome.google.com/webstore/detail/ilikdighfoieecgeiffoekahmpjoekii" />
-#[doctor](https://chrome.google.com/webstore/detail/doctor/ilikdighfoieecgeiffoekahmpjoekii)
+#[doctor](https://chrome.google.com/webstore/detail/ilikdighfoieecgeiffoekahmpjoekii)
 On-the-fly docco document generation.
 
 ##tl;dr
@@ -44,6 +42,6 @@ _would_ have spit out.
 if(navigator.userAgent.indexOf('Chrome') > -1) {
   document.getElementsByTagName('button')[0].addEventListener('click',
   function() {
-    chrome.webstore.install('https://chrome.google.com/webstore/detail/doctor/ilikdighfoieecgeiffoekahmpjoekii'); });
+    chrome.webstore.install('https://chrome.google.com/webstore/detail/ilikdighfoieecgeiffoekahmpjoekii'); });
 }
 </script>
