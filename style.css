@@ -1,0 +1,126 @@
+html,
+body {
+  margin: 0;
+}
+body {
+  font-family: arial;
+  font-size: 1.1em;
+  width: 50%;
+  margin: auto;
+  margin-top: 5em;
+  margin-bottom: 5em;
+  color: #333333;
+  background-color: #ffffff;
+}
+/* headings */
+h1,
+h2,
+h3,
+h4 {
+  font-family: palatino;
+  margin: 0.5em 1em;
+  margin: 1em;
+  margin-bottom: 0.5em;
+}
+/* paragraphs */
+p {
+  text-indent: 2em;
+  margin: 1em 2em;
+  line-height: 1.8em;
+}
+/* links */
+a {
+  text-decoration: none;
+}
+/* lists */
+li {
+  margin-bottom: 0.5em;
+}
+/* dividers */
+hr {
+  width: 100%;
+  border: none;
+  border-top: 2px solid #333333;
+  margin: 0;
+  position: relative;
+}
+pre,
+code {
+  font-family: courier;
+}
+code {
+  color: #000;
+  position: relative;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  padding: 0em 0.1em;
+  background-color: #eee;
+}
+pre code {
+  border: none;
+}
+pre {
+  background-color: #eee;
+  margin: 2em 1em;
+  padding: 0.5em;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+}
+/* blockquotes */
+blockquote {
+  border-left: 1px solid #333333;
+  padding: 0.01em 0em;
+  font-style: italic;
+}
+@media (max-width: 1100px) {
+  body {
+    width: 60%;
+  }
+  p,
+  li {
+    line-height: 2em;
+  }
+  pre {
+    margin-left: 0px;
+    margin-right: 0px;
+    font-size: 1em;
+  }
+}
+@media (max-width: 900px) {
+  pre {
+    margin-left: 0px;
+    margin-right: 0px;
+    font-size: 1em;
+  }
+}
+@media (max-width: 800px) {
+  body {
+    width: 80%;
+    margin-top: 2em;
+  }
+  p,
+  li {
+    line-height: 1.5em;
+  }
+  pre {
+    margin-left: 0px;
+    margin-right: 0px;
+    font-size: 0.8em;
+  }
+}
+@media (max-width: 400px) {
+  body {
+    width: 100%;
+    margin-top: 1em;
+  }
+  p,
+  li {
+    line-height: 1.3em;
+  }
+  pre {
+    border-radius: 0px;
+    border-left: none;
+    border-right: none;
+    font-size: 0.8em;
+  }
+}
