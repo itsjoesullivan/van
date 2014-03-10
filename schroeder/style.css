@@ -43,6 +43,7 @@
   .copy {
     width: 800px;
     margin: auto;
+    padding-bottom: 2em;
   }
   .copy p {
     font-size: 1.2em;
