@@ -1,39 +1,7 @@
 <!doctype html>
 <html>
 <head>
-<style>
-  html {
-    -webkit-font-smoothing: antialiased;
-  }
-  body {
-    position: relative;
-    margin: 0;
-    font-family: palatino;
-  }
-  .banner {
-    width: 800px;
-    margin: auto;
-  }
-  .banner img {
-    width: 100%;
-  }
-  .hero {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 230px;
-    color: #f4f4f4;
-    font-size: 3em;
-
-  }
-  .copy {
-    width: 800px;
-    margin: auto;
-  }
-  .copy p {
-    font-size: 1.2em;
-  }
-  </style>
+<link rel='stylesheet' href='style.css' />
 </head>
 <body>
   <div class="banner">
@@ -44,22 +12,13 @@
     <p>Schroeder is a hardware music keyboard built on a web stack.</p>
     <h2>The stack</h2>
     <p>Under the cover is a Chromebox running an app I developed 'specially for schroeder</p>
-    <p>The other hardware is a midi keyboard ( <a target="_blank" href="https://www.google.com/search?q=yamama+micro+key&oq=yamama+micro+key&aqs=chrome..69i57.2486j0j7&sourceid=chrome&es_sm=91&ie=UTF-8#q=microkey+25">a Korg microKEY 25</a> ), an amp and speaker, and a wooden case.</p>
+    <p>The other hardware is a midi keyboard ( <a target="_blank" href="http://www.korg.com/us/products/controllers/microkey/">a Korg microKEY 25</a> ), an amp and speaker, and a wooden case.</p>
 
     <h3>The app</h3>
     <p>The app is a Chrome packaged app. It uses the USB API to listen to the keyboard (<a target="_blank" href="https://gist.github.com/itsjoesullivan/8064641">here's a gist to the code for that</a>), maps notes/velocity to audio files, and uses the Web Audio API to play them.</p>
 
     <h3>The sound</h3>
-    <p>The sound is the best Wurlitzer sound I could practically get.</p>
-    <p>I'd have loved to rent and sample one myself, but there was _some_ limit to the scope of this project, so I settled on the second best thing: sampling Native Instruments' <a target="_blank" href="http://www.native-instruments.com/en/products/komplete/keys/scarbee-a200/artists/">Scarbee A-200</a></p>
-    <p>And, frankly speaking, I'm sure that sampling THEIR samples turned out better than recording them myself.</p>
-    <p>For the actual sampling:</p>
-    <ol>
-      <li>Load up the keyboard in GarageBand</li>
-      <li>Create a midi region containing the notes you want to play. For me, it was four octaves sampled at the C and F# with five velocity layers</li>
-      <li>Bounce down the project into a single wav</li>
-      <li>Use a bash script and <a target="blank" href="http://sox.sourceforge.net/">SoX</a> to split up the file, using a helpful naming convention</li>
-      <li>Request the files on the client side</li>
+    <p>Much as I'd have liked to record a wurlitzer myself, I ended up sampling the <a target="_blank" href="http://www.native-instruments.com/en/products/komplete/keys/scarbee-a200/artists/">Scarbee A-200</a> virtual instrument instead.</p>
   </div>
 </body>
 </html>
