@@ -2,6 +2,31 @@
 <html>
 <head>
 <link rel='stylesheet' href='style.css' />
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-31945659-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<!-- AddThis Smart Layers BEGIN -->
+<!-- Go to http://www.addthis.com/get/smart-layers to customize -->
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 3
+    }   
+  });
+</script>
+<!-- AddThis Smart Layers END -->
 </head>
 <body>
   <div class="banner">
@@ -14,11 +39,11 @@
     <p>Under the cover is a Chromebox running an app I developed 'specially for schroeder</p>
     <p>The other hardware is a midi keyboard ( <a target="_blank" href="http://www.korg.com/us/products/controllers/microkey/">a Korg microKEY 25</a> ), an amp and speaker, and a wooden case.</p>
 
-    <h3>The app</h3>
+    <h2>The app</h2>
     <p>The app is a Chrome packaged app. It uses the USB API to listen to the keyboard (<a target="_blank" href="https://gist.github.com/itsjoesullivan/8064641">here's a gist to the code for that</a>), maps notes/velocity to audio files, and uses the Web Audio API to play them.</p>
     <p>It's written in coffeescript and does a little requirejs'ing.</p>
 
-    <h3>The sound</h3>
+    <h2>The sound</h2>
     <p>Much as I'd have liked to record a wurlitzer myself, I ended up sampling the <a target="_blank" href="http://www.native-instruments.com/en/products/komplete/keys/scarbee-a200/artists/">Scarbee A-200</a> virtual instrument instead.</p>
   </div>
 </body>
