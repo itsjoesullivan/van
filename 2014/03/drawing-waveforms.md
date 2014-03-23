@@ -1,4 +1,3 @@
-<link rel='stylesheet' href='https://raw.githubusercontent.com/jasonm23/markdown-css-themes/gh-pages/avenir-white.css'>
 <style>
   body {
     padding-bottom: 60px;
