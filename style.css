@@ -61,6 +61,7 @@ code {
 }
 pre code {
   border: none;
+  font-size: 13px;
 }
 pre {
   background-color: #eee;
