@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="/van/style.css" />
+</head>
+<body>
+<p><link rel='stylesheet' href='https://raw.githubusercontent.com/jasonm23/markdown-css-themes/gh-pages/avenir-white.css'></p>
+<p><style>
+  body {
+    padding-bottom: 60px;
+  }
+</style></p>
+<h1>Drawing Audio Waveforms</h1>
+<p>Working on <a href="http://scat.io">scat.io</a> I ran into the interesting issue of rendering audio waveforms on screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that.</p>
+<h2>The data</h2>
+<p>We receive the audio data in the form of a typed array, like:</p>
+<pre><code>[ 0, 0.0253245, 0.0452343, ... ]</code></pre>
+<p>So far so good, except that the length of the array is 44100 * secondLength</p>
+<h3>Boiling it down</h3>
+<p>So let&#39;s boil that down. We don&#39;t reasonably need more data than we can display on the screen. In other words, we only need an array of values with length equal to the number of pixels along the x-axis.</p>
+<pre><code class="lang-javascript">function boil( data, pixels ) {
+  var pixelLength = Math.round(data.length/pixels);
+  var vals = [];
+
+  // For each pixel we display
+  for (var i = 0; i &lt; pixels; i++) {
+    var posSum = 0,
+      negSum = 0;
+
+    // Cycle through the data-points relevant to the pixel
+    for (var j = 0; j &lt; pixelLength; j++) {
+      var val = data[ i * pixelLength + j ];
+
+      // Keep track of positive and negative values separately
+      if (val &gt; 0) {
+        posSum += val;
+      } else {
+        negSum += val;
+      }
+    }
+    vals.push( [ negSum / pixelLength, posSum / pixelLength ] );
+  }
+  return vals;
+}</code></pre>
+<h2>Rendering</h2>
+<p>Now let&#39;s use our <code>boil</code> function along with d3 to draw the waveform:</p>
+<pre><code class="lang-javascript">function render(data, containerEl) {
+  // Vertical scale
+  var multiplier = 500;
+
+  d3.select( containerEl )
+    .selectAll(&#39;div&#39;)
+    // boil down the large array into a 100px result
+    .data( boil( data, 100 ) )
+    .enter()
+    .append(&#39;div&#39;)
+
+    // Height should be the sum of the negative and positive values
+    .style(&#39;height&#39;, function( point ) {
+      var sum = point[1] - point[0];
+      return sum * multiplier + &#39;px&#39;;
+    })
+
+    // Distance from top should be the height of the positive value
+    .style(&#39;margin-top&#39;), function( point ) {
+      return -point[1] * multiplier + &#39;px&#39;;
+    });
+}</code></pre>
+<h2>Results</h2>
+<p>Incorporating this logic into my <code>RegionView</code>, here&#39;s what pops out:</p>
+<center>
+<img src='waveform.png' style='width:300px'>
+</center>
+
+<p>Looks pretty darn good to me!</p>
+<h2>Further considerations</h2>
+<h3>Scaling</h3>
+<p>The biggest problem with the above is that we&#39;re cycling through the entire audio data array, which may be many million datapoints long.</p>
+<p>Luckily, regardless of the input array size, the information we want to render is only as large as the number of pixels we want to display it on. So, for longer clips, we can throw out most of the data:</p>
+<pre><code class="lang-javascript">function boil( data, pixels ) {
+  var pixelLength = Math.round(data.length/pixels);
+  var vals = [];
+
+  // 1000 datapoints / second
+  var sampleEvery = 44;
+
+  // For each pixel we display
+  for (var i = 0; i &lt; pixels; i++) {
+    var posSum = 0,
+      negSum = 0;
+
+    // Cycle through the data-points relevant to the pixel
+    for (var j = 0; j &lt; pixelLength; j++) {
+      var index = i * pixelLength + j;
+      if ( index % sampleEvery !== 0 ) {
+        continue;
+      var val = data[ index ];
+
+      // Keep track of positive and negative values separately
+      if (val &gt; 0) {
+        posSum += val;
+      } else {
+        negSum += val;
+      }
+    }
+    vals.push( [ negSum * sampleEvery / pixelLength, posSum * sampleEvery / pixelLength ] );
+  }
+  return vals;
+}</code></pre>
+</body>
+</html>
