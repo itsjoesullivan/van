@@ -122,7 +122,10 @@ function boil( data, pixels ) {
         negSum += val;
       }
     }
-    vals.push( [ negSum * sampleEvery / pixelLength, posSum * sampleEvery / pixelLength ] );
+    vals.push( [ 
+      negSum * sampleEvery / pixelLength, 
+      posSum * sampleEvery / pixelLength 
+    ] );
   }
   return vals;
 }
