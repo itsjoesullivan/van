@@ -8,7 +8,11 @@ var exec = require('gulp-exec');
 gulp.task('default', function() {
 
   gulp.src('index.md')
-    .pipe(md())
+    .pipe(md({
+      highlight: function(code) {
+        return require('highlight.js').highlightAuto(code).value;
+      }
+    }))
     .pipe(rename(function(path) {
       path.extname = '.html';
     }))
