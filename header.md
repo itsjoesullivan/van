@@ -1,5 +1,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel='stylesheet' href='/van/style.css'>
+<link rel='stylesheet' href='/van/lib/highlightjs-8.0.css'>
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
