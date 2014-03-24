@@ -3,7 +3,7 @@
     padding-bottom: 60px;
   }
 </style>
-#Drawing Audio Waveforms
+# Drawing Audio Waveforms
 
 Working on [scat.io](http://scat.io) I ran into the interesting issue of rendering audio waveforms on screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that.
 
