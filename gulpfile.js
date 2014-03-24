@@ -4,6 +4,7 @@ var md = require('gulp-marked');
 var rename = require('gulp-rename');
 var header = require('gulp-header');
 var fs = require('fs');
+var exec = require('gulp-exec');
 gulp.task('default', function() {
 
   gulp.src('index.md')
@@ -21,4 +22,10 @@ gulp.task('default', function() {
       extname: '.html'
     }))
     .pipe(gulp.dest('./'));
+});
+
+gulp.task('deploy', function() {
+  gulp.src('index.html')
+    .pipe(exec('git add -A'))
+    .pipe(exec('git commit -m "' + (new Date()) + ' deploy"') );
 });
