@@ -1,4 +1,7 @@
 #joesul.li/van
+<link rel='stylesheet' href='/van/style.css'>
+
+This spring: meet [schroeder](/van/schroeder)
 
 - [js-vim](https://github.com/itsjoesullivan/js-vim)
 
