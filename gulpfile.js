@@ -16,7 +16,11 @@ gulp.task('default', function() {
 
   gulp.src('2014/03/drawing-waveforms/*.md')
     .pipe(header( fs.readFileSync(__dirname + '/header.md') ) )
-    .pipe(md())
+    .pipe(md({
+      highlight: function(code) {
+        return require('highlight.js').highlightAuto(code).value;
+      }
+    }))
     .pipe(rename({
       dirname: '2014/03/drawing-waveforms',
       extname: '.html'
