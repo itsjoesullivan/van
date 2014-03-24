@@ -58,6 +58,7 @@ code {
   border: 1px solid #ddd;
   padding: 0em 0.1em;
   background-color: #eee;
+  line-height: 1.3em;
 }
 pre code {
   border: none;
