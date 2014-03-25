@@ -179,7 +179,4 @@ Results:
 <div id='ex4'></div>
 <br>
 
-It looks almost as good and will render audio clips as long as you desire in the same amount of time.
-
-Thanks for reading!
-
+It looks almost as good and will render audio clips of any length quickly
