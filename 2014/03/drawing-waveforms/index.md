@@ -21,7 +21,7 @@ We receive the audio data in the form of a typed array, like:
 
 Audio data is that simple. Practically speaking, the values of the array correspond to the position of a speaker. At 44100 frames per second, it hardly sounds digital at all.
 
-So far so good, except that the length of the array has 44100 frames per second.
+So far so good, except for those pesky 44100 frames for every second of audio...
 
 ###Boiling it down
 

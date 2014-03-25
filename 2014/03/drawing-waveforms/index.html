@@ -33,7 +33,7 @@
 <p>We receive the audio data in the form of a typed array, like:</p>
 <pre><code>[ <span class="hljs-number">0</span>, <span class="hljs-number">0.0253245</span>, <span class="hljs-number">0.0452343</span>, <span class="hljs-keyword">...</span> ]</code></pre>
 <p>Audio data is that simple. Practically speaking, the values of the array correspond to the position of a speaker. At 44100 frames per second, it hardly sounds digital at all.</p>
-<p>So far so good, except that the length of the array has 44100 frames per second.</p>
+<p>So far so good, except for those pesky 44100 frames for every second of audio...</p>
 <h3 id="boiling-it-down">Boiling it down</h3>
 <p>So let&#39;s pare down this data. We don&#39;t reasonably need more data than we can display on the screen. In other words, we only need an array of values with length equal to the number of pixels along the x-axis.</p>
 <pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">summarize</span><span class="hljs-params">( data, pixels )</span> {</span>
