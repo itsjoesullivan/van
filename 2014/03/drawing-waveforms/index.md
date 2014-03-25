@@ -179,4 +179,4 @@ Results:
 <div id='ex4'></div>
 <br>
 
-It looks almost as good and will render audio clips of any length quickly
+It looks almost as good and will render audio clips of any length quickly.
