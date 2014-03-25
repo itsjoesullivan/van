@@ -14,7 +14,7 @@
   })();
 </script>
 
-<p><script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script></p>
+<p><!--script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script--></p>
 <p><script type="text/javascript" src='/van/script.js'></script></p>
 <p><style>
   /<em> comment </em>/
@@ -22,16 +22,19 @@
     padding-bottom: 60px;
   }
 </style></p>
+<p><link rel='stylesheet' href='style.css'></p>
+<p><script src='//cdnjs.cloudflare.com/ajax/libs/d3/3.4.3/d3.min.js'></script></p>
+<p><script src='script.js'></script></p>
 <h1 id="drawing-audio-waveforms">Drawing Audio Waveforms</h1>
-<p>Working on <a href="http://scat.io">scat.io</a> I ran into the interesting issue of rendering audio waveforms on screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that.</p>
+<p>Working on <a href="http://scat.io">scat.io</a> I ran into the interesting issue of rendering audio waveforms on-screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that. Using d3 and the Web Audio API.</p>
 <h2 id="the-data">The data</h2>
 <p>We receive the audio data in the form of a typed array, like:</p>
 <pre><code>[ <span class="hljs-number">0</span>, <span class="hljs-number">0.0253245</span>, <span class="hljs-number">0.0452343</span>, <span class="hljs-keyword">...</span> ]</code></pre>
 <p>Audio data is that simple. Practically speaking, the values of the array correspond to the position of a speaker. At 44100 frames per second, it hardly sounds digital at all.</p>
-<p>So far so good, except that the length of the array is 44100 * secondLength...</p>
+<p>So far so good, except that the length of the array has 44100 frames per second.</p>
 <h3 id="boiling-it-down">Boiling it down</h3>
-<p>So let&#39;s boil that down. We don&#39;t reasonably need more data than we can display on the screen. In other words, we only need an array of values with length equal to the number of pixels along the x-axis.</p>
-<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">boil</span><span class="hljs-params">( data, pixels )</span> {</span>
+<p>So let&#39;s pare down this data. We don&#39;t reasonably need more data than we can display on the screen. In other words, we only need an array of values with length equal to the number of pixels along the x-axis.</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">summarize</span><span class="hljs-params">( data, pixels )</span> {</span>
   <span class="hljs-keyword">var</span> pixelLength = <span class="hljs-built_in">Math</span>.round(data.length/pixels);
   <span class="hljs-keyword">var</span> vals = [];
 
@@ -56,46 +59,78 @@
   <span class="hljs-keyword">return</span> vals;
 }</code></pre>
 <h2 id="rendering">Rendering</h2>
-<p>Now let&#39;s use our <code>boil</code> function along with d3 to draw the waveform:</p>
-<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render</span><span class="hljs-params">(data, containerEl)</span> {</span>
-  <span class="hljs-comment">// Vertical scale</span>
-  var multiplier = <span class="hljs-number">500</span>;
-
-  <span class="hljs-transposed_variable">d3.</span><span class="hljs-keyword">select</span>( containerEl )
+<p>First I gave it the old college try:</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render1</span><span class="hljs-params">()</span> {</span>
+  <span class="hljs-keyword">var</span> multiplier = <span class="hljs-number">100</span>;
+  <span class="hljs-keyword">var</span> summary = summarize(data, <span class="hljs-number">100</span>);
+  d3.select(<span class="hljs-string">'#ex1'</span>)
     .selectAll(<span class="hljs-string">'div'</span>)
-    <span class="hljs-comment">// boil down the large array into a 100px result</span>
-    .data( boil( data, <span class="hljs-number">100</span> ) )
+    .data( summary )
     .enter()
     .append(<span class="hljs-string">'div'</span>)
-
-    <span class="hljs-comment">// Height should be the sum of the negative and positive values</span>
-    .style(<span class="hljs-string">'height'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( point )</span> {</span>
-      var <span class="hljs-built_in">sum</span> = point<span class="hljs-matrix">[<span class="hljs-number">1</span>]</span> - point<span class="hljs-matrix">[<span class="hljs-number">0</span>]</span>;
-      <span class="hljs-keyword">return</span> <span class="hljs-built_in">sum</span> * multiplier + <span class="hljs-string">'px'</span>;
-    })
-
-    <span class="hljs-comment">// Distance from top should be the height of the positive value</span>
-    .style(<span class="hljs-string">'margin-top'</span>), <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( point )</span> {</span>
-      <span class="hljs-keyword">return</span> -point<span class="hljs-matrix">[<span class="hljs-number">1</span>]</span> * multiplier + <span class="hljs-string">'px'</span>;
+    .style(<span class="hljs-string">'height'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      <span class="hljs-keyword">var</span> sum = pt[<span class="hljs-number">1</span>] - pt[<span class="hljs-number">0</span>];
+      <span class="hljs-keyword">return</span> sum * multiplier + <span class="hljs-string">'px'</span>;
     });
 }</code></pre>
-<h2 id="results">Results</h2>
-<p>Incorporating this logic into my <code>RegionView</code>, here&#39;s what pops out:</p>
-<center>
-<img src='waveform.png' style='width:300px'>
-</center>
-
-<p>Looks pretty darn good to me!</p>
+<p>Resulting in:</p>
+<p><div id='ex1'></div>
+<br>
+Not bad--obviously we&#39;re looking at audio data. But it&#39;s not symmetrical. Let&#39;s center those lines:</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render2</span><span class="hljs-params">()</span> {</span>
+  var multiplier = <span class="hljs-number">100</span>;
+  var summary = summaraize(data, <span class="hljs-number">200</span>);
+  <span class="hljs-transposed_variable">d3.</span><span class="hljs-keyword">select</span>(<span class="hljs-string">'#ex1'</span>)
+    .selectAll(<span class="hljs-string">'div'</span>)
+    .data( summary )
+    .enter()
+    .append(<span class="hljs-string">'div'</span>)
+    .style(<span class="hljs-string">'height'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      var <span class="hljs-built_in">sum</span> = pt<span class="hljs-matrix">[<span class="hljs-number">1</span>]</span>;
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">sum</span> * multiplier + <span class="hljs-string">'px'</span>;
+    })
+    <span class="hljs-comment">// </span>
+    .style(<span class="hljs-string">'margin-top'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      var <span class="hljs-built_in">sum</span> = pt<span class="hljs-matrix">[<span class="hljs-number">1</span>]</span>/<span class="hljs-number">2</span>;
+      <span class="hljs-keyword">return</span> - <span class="hljs-built_in">sum</span> * multiplier + <span class="hljs-string">'px'</span>;
+    });
+}</code></pre>
+<p>Result:</p>
+<p><div id='ex2'></div>
+<br>
+Even better. However, we&#39;re not really being honest here because we&#39;re just mirroring the waveform, ignoring the 50% of the data beneath zero. (Now you can see why <code>summarize</code> tallies positive and negative datapoints separately.)</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render3</span><span class="hljs-params">()</span> {</span>
+  <span class="hljs-keyword">var</span> multiplier = <span class="hljs-number">200</span>;
+  <span class="hljs-keyword">var</span> summary = summarize(data, <span class="hljs-number">300</span>);
+  d3.select(<span class="hljs-string">'#ex3'</span>)
+    .selectAll(<span class="hljs-string">'div'</span>)
+    .data( summary )
+    .enter()
+    .append(<span class="hljs-string">'div'</span>)
+    .style(<span class="hljs-string">'height'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      <span class="hljs-keyword">var</span> sum = pt[<span class="hljs-number">1</span>] - pt[<span class="hljs-number">0</span>];
+      <span class="hljs-keyword">return</span> sum * multiplier + <span class="hljs-string">'px'</span>;
+    })
+    .style(<span class="hljs-string">'margin-top'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      <span class="hljs-keyword">return</span> - pt[<span class="hljs-number">1</span>] * multiplier + <span class="hljs-string">'px'</span>;
+    });
+}</code></pre>
+<p>Result:</p>
+<p><div id='ex3'></div>
+<br></p>
+<p>Ahh. Pleasantly imperfect. This is the algorithm I pretty much stuck with.</p>
 <h2 id="further-considerations">Further considerations</h2>
-<h3 id="scaling">Scaling</h3>
-<p>The biggest problem with the above is that we&#39;re cycling through the entire audio data array, which may be many million datapoints long.</p>
-<p>Luckily, regardless of the input array size, the information we want to render is only as large as the number of pixels we want to display it on. So, for longer clips, we can throw out most of the data:</p>
-<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">boil</span><span class="hljs-params">( data, pixels )</span> {</span>
+<h3 id="performance">Performance</h3>
+<p>Now, keep in mind that it took my modest machine under 10ms to draw each of these waveforms. The way my original <code>summarize</code> code is written, however, that duration will scale with audio clip length--the majority of the processing time is spent looping through the audio clip. </p>
+<p>But luckily we aren&#39;t concerned with what each individual audio frame says--we just want enough of a snapshot to draw an accurate pixel. In other words, rendering audio waveforms should be limited by the dimensions of the rendering, not the length of the clip.</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">summarizeFaster</span><span class="hljs-params">( data, pixels )</span> {</span>
   <span class="hljs-keyword">var</span> pixelLength = <span class="hljs-built_in">Math</span>.round(data.length/pixels);
   <span class="hljs-keyword">var</span> vals = [];
 
-  <span class="hljs-comment">// 1000 datapoints / second</span>
-  <span class="hljs-keyword">var</span> sampleEvery = <span class="hljs-number">44</span>;
+  <span class="hljs-comment">// Define a minimum sample size per pixel</span>
+  <span class="hljs-keyword">var</span> maxSampleSize = <span class="hljs-number">1000</span>;
+  sampleSize = <span class="hljs-built_in">Math</span>.min(pixelLength, maxSampleSize);
+
 
   <span class="hljs-comment">// For each pixel we display</span>
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; pixels; i++) {
@@ -103,11 +138,9 @@
       negSum = <span class="hljs-number">0</span>;
 
     <span class="hljs-comment">// Cycle through the data-points relevant to the pixel</span>
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; pixelLength; j++) {
-      <span class="hljs-keyword">var</span> index = i * pixelLength + j;
-      <span class="hljs-keyword">if</span> ( index % sampleEvery !== <span class="hljs-number">0</span> ) {
-        <span class="hljs-keyword">continue</span>;
-      <span class="hljs-keyword">var</span> val = data[ index ];
+    <span class="hljs-comment">// Don't cycle through more than sampleSize frames per pixel.</span>
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>; j &lt; sampleSize; j++) {
+      <span class="hljs-keyword">var</span> val = data[ i * pixelLength + j ];
 
       <span class="hljs-comment">// Keep track of positive and negative values separately</span>
       <span class="hljs-keyword">if</span> (val &gt; <span class="hljs-number">0</span>) {
@@ -116,10 +149,12 @@
         negSum += val;
       }
     }
-    vals.push( [ 
-      negSum * sampleEvery / pixelLength, 
-      posSum * sampleEvery / pixelLength 
-    ] );
+    vals.push( [ negSum / pixelLength, posSum / pixelLength ] );
   }
   <span class="hljs-keyword">return</span> vals;
 }</code></pre>
+<p>Results:</p>
+<p><div id='ex4'></div>
+<br></p>
+<p>It looks almost as good and will render audio clips as long as you desire in the same amount of time.</p>
+<p>Thanks for reading!</p>

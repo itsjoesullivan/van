@@ -1,0 +1,13 @@
+#ex1, #ex2, #ex3, #ex4 {
+  display: block;
+  margin: auto;
+  width: 300px;
+  margin-bottom: 4em;
+}
+#ex1 div, #ex2 div, #ex3 div, #ex4 div {
+  width: 1px;
+  position:relative;
+  float: left;
+  display: inline;
+  background-color: #333;
+}

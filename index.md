@@ -3,19 +3,18 @@
 
 This spring: meet [schroeder](/van/schroeder)
 
-## Open source
 
 ### Components
 
-- [thread](https://github.com/itsjoesullivan/thread)
+<li>[thread](https://github.com/itsjoesullivan/thread)</li>
 
   A sane approach to web workers
 
-- [recorderjs](https://github.com/itsjoesullivan/recorderjs)
+<li>[recorderjs](https://github.com/itsjoesullivan/recorderjs)</li>
 
   Web workers for heavy-lifting of audio buffers, as a component.
 
-- [js-vim](https://github.com/itsjoesullivan/js-vim)
+<li>[js-vim](https://github.com/itsjoesullivan/js-vim)</li>
 
     ```javascript
     vim = new Vim();
@@ -24,7 +23,7 @@ This spring: meet [schroeder](/van/schroeder)
     // "hello, world"
     ```
 
-- [json2html](https://github.com/addthis/json2html)
+<li>[json2html](https://github.com/addthis/json2html)</li>
 
     ```javascript
     json2html({ "div.name-tag": "Hello, World" })
