@@ -28,7 +28,7 @@
 <p><script src='//cdnjs.cloudflare.com/ajax/libs/d3/3.4.3/d3.min.js'></script></p>
 <p><script src='script.js'></script></p>
 <h1 id="drawing-audio-waveforms">Drawing Audio Waveforms</h1>
-<p>Working on <a href="http://scat.io">scat.io</a> I ran into the interesting issue of rendering audio waveforms on-screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that. Using d3 and the Web Audio API.</p>
+<p>Working on <a href="http://scat.io">scat.io</a> I ran into the interesting issue of rendering audio waveforms on-screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that using d3 and the Web Audio API.</p>
 <h2 id="the-data">The data</h2>
 <p>We receive the audio data in the form of a typed array, like:</p>
 <pre><code>[ <span class="hljs-number">0</span>, <span class="hljs-number">0.0253245</span>, <span class="hljs-number">0.0452343</span>, <span class="hljs-keyword">...</span> ]</code></pre>

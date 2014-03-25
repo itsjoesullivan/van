@@ -11,7 +11,7 @@
 <script src='script.js'></script>
 # Drawing Audio Waveforms
 
-Working on [scat.io](http://scat.io) I ran into the interesting issue of rendering audio waveforms on-screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that. Using d3 and the Web Audio API.
+Working on [scat.io](http://scat.io) I ran into the interesting issue of rendering audio waveforms on-screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that using d3 and the Web Audio API.
 
 ##The data
 
