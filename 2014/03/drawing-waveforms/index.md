@@ -139,7 +139,7 @@ Ahh. Pleasantly imperfect. This is the algorithm I pretty much stuck with.
 
 Now, keep in mind that it took my modest machine under 10ms to draw each of these waveforms. The way my original <code>summarize</code> code is written, however, that duration will scale with audio clip length--the majority of the processing time is spent looping through the audio clip. 
 
-But luckily we aren't concerned with what each individual audio frame says--we just want enough of a snapshot to draw an accurate pixel. In other words, rendering audio waveforms should be limited by the dimensions of the rendering, not the length of the clip.
+But luckily we aren't concerned with what each individual audio frame says; we just want enough of a snapshot to draw an accurate pixel. In other words, rendering audio waveforms should be limited by the dimensions of the rendering, not the length of the clip.
 
 ```javascript
 function summarizeFaster( data, pixels ) {
@@ -168,7 +168,7 @@ function summarizeFaster( data, pixels ) {
         negSum += val;
       }
     }
-    vals.push( [ negSum / pixelLength, posSum / pixelLength ] );
+    vals.push( [ negSum / sampleSize, posSum / sampleSize ] );
   }
   return vals;
 }
