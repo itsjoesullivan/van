@@ -5,6 +5,8 @@
   }
 </style>
 <link rel='stylesheet' href='style.css'>
+<title>Drawing Audio Waveforms - joesul.li/van</title>
+<meta name="description" content="Draw audio regions in the browser using d3.">
 <script src='//cdnjs.cloudflare.com/ajax/libs/d3/3.4.3/d3.min.js'></script>
 <script src='script.js'></script>
 # Drawing Audio Waveforms
