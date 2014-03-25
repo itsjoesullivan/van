@@ -143,6 +143,8 @@ Now, keep in mind that it took my modest machine under 10ms to draw each of thes
 
 But luckily we aren't concerned with what each individual audio frame says; we just want enough of a snapshot to draw an accurate pixel. In other words, rendering audio waveforms should be limited by the dimensions of the rendering, not the length of the clip.
 
+So let's define a <code>maxSampleSize</code> which limits how many frames we count per pixel:
+
 ```javascript
 function summarizeFaster( data, pixels ) {
   var pixelLength = Math.round(data.length/pixels);

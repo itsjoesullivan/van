@@ -125,6 +125,7 @@ Even better. However, we&#39;re not really being honest here because we&#39;re j
 <h3 id="performance">Performance</h3>
 <p>Now, keep in mind that it took my modest machine under 10ms to draw each of these waveforms. The way my original <code>summarize</code> code is written, however, that duration will scale with audio clip length--the majority of the processing time is spent looping through the audio clip. </p>
 <p>But luckily we aren&#39;t concerned with what each individual audio frame says; we just want enough of a snapshot to draw an accurate pixel. In other words, rendering audio waveforms should be limited by the dimensions of the rendering, not the length of the clip.</p>
+<p>So let&#39;s define a <code>maxSampleSize</code> which limits how many frames we count per pixel:</p>
 <pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">summarizeFaster</span><span class="hljs-params">( data, pixels )</span> {</span>
   <span class="hljs-keyword">var</span> pixelLength = <span class="hljs-built_in">Math</span>.round(data.length/pixels);
   <span class="hljs-keyword">var</span> vals = [];
