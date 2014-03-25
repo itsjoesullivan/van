@@ -1,0 +1,147 @@
+window.AudioContext = window.AudioContext||window.webkitAudioContext;
+context = new AudioContext();
+var request = new XMLHttpRequest();
+  request.open('GET', './sample.mp3', true);
+  request.responseType = 'arraybuffer';
+  request.onload = function() {
+    context.decodeAudioData(request.response, function(buffer) {
+      window.buffer = buffer;
+      init();
+    }, function() {});
+}
+request.send();
+
+var init = function() {
+  var res = summarizeFinal(buffer.getChannelData(0), 100);
+  window.data = buffer.getChannelData(0);
+  render1();
+  render2();
+  var startTime = new Date();
+  render3();
+  console.log(Date.now() - startTime);
+  var startTime = new Date();
+  render4();
+  console.log(Date.now() - startTime);
+};
+
+
+function render1() {
+  var multiplier = 400;
+  var summary = summarizeFinal(data, 300);
+  d3.select('#ex1')
+    .selectAll('div')
+    .data( summary )
+    .enter()
+    .append('div')
+    .style('height', function( pt ) {
+      var sum = pt[1];
+      return sum * multiplier + 'px';
+    });
+}
+
+function render2() {
+  var multiplier = 400;
+  var summary = summarizeFinal(data, 300);
+  d3.select('#ex2')
+    .selectAll('div')
+    .data( summary )
+    .enter()
+    .append('div')
+    .style('height', function( pt ) {
+      var sum = pt[1];
+      return sum * multiplier + 'px';
+    })
+    .style('margin-top', function( pt ) {
+      var sum = pt[1]/2;
+      return - sum * multiplier + 'px';
+    });
+}
+
+function render3() {
+  var multiplier = 200;
+  var summary = summarizeFinal(data, 300);
+  d3.select('#ex3')
+    .selectAll('div')
+    .data( summary )
+    .enter()
+    .append('div')
+    .style('height', function( pt ) {
+      var sum = pt[1] - pt[0];
+      return sum * multiplier + 'px';
+    })
+    .style('margin-top', function( pt ) {
+      return - pt[1] * multiplier + 'px';
+    });
+}
+
+function render4() {
+  var multiplier = 200;
+  var summary = summarizeFaster(data, 300);
+  d3.select('#ex4')
+    .selectAll('div')
+    .data( summary )
+    .enter()
+    .append('div')
+    .style('height', function( pt ) {
+      var sum = pt[1] - pt[0];
+      return sum * multiplier + 'px';
+    })
+    .style('margin-top', function( pt ) {
+      return - pt[1] * multiplier + 'px';
+    });
+}
+
+
+function summarizeFinal( data, pixels ) {
+  var pixelLength = Math.round(data.length/pixels);
+  var vals = [];
+
+  // For each pixel we display
+  for (var i = 0; i < pixels; i++) {
+    var posSum = 0,
+      negSum = 0;
+
+    // Cycle through the data-points relevant to the pixel
+    for (var j = 0; j < pixelLength; j++) {
+
+      var val = data[ i * pixelLength + j ];
+
+      // Keep track of positive and negative values separately
+      if (val > 0) {
+        posSum += val;
+      } else {
+        negSum += val;
+      }
+    }
+    vals.push( [ negSum / pixelLength, posSum / pixelLength ] );
+  }
+  return vals;
+}
+
+function summarizeFaster( data, pixels ) {
+  var pixelLength = Math.round(data.length/pixels);
+  var vals = [];
+  var minSample = 1000;
+  sampleSize = Math.min(pixelLength, minSample);
+
+
+  // For each pixel we display
+  for (var i = 0; i < pixels; i++) {
+    var posSum = 0,
+      negSum = 0;
+
+    // Cycle through the data-points relevant to the pixel
+    for (var j = 0; j < sampleSize; j++) {
+      var val = data[ i * pixelLength + j ];
+
+      // Keep track of positive and negative values separately
+      if (val > 0) {
+        posSum += val;
+      } else {
+        negSum += val;
+      }
+    }
+    vals.push( [ negSum / sampleSize, posSum / sampleSize ] );
+  }
+  return vals;
+}

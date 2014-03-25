@@ -4,9 +4,12 @@
     padding-bottom: 60px;
   }
 </style>
+<link rel='stylesheet' href='style.css'>
+<script src='//cdnjs.cloudflare.com/ajax/libs/d3/3.4.3/d3.min.js'></script>
+<script src='script.js'></script>
 # Drawing Audio Waveforms
 
-Working on [scat.io](http://scat.io) I ran into the interesting issue of rendering audio waveforms on screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that.
+Working on [scat.io](http://scat.io) I ran into the interesting issue of rendering audio waveforms on-screen. This is a walkthrough of my trial-and-error method of figuring out a good way to accomplish that. Using d3 and the Web Audio API.
 
 ##The data
 
@@ -16,14 +19,14 @@ We receive the audio data in the form of a typed array, like:
 
 Audio data is that simple. Practically speaking, the values of the array correspond to the position of a speaker. At 44100 frames per second, it hardly sounds digital at all.
 
-So far so good, except that the length of the array is 44100 * secondLength...
+So far so good, except that the length of the array has 44100 frames per second.
 
 ###Boiling it down
 
-So let's boil that down. We don't reasonably need more data than we can display on the screen. In other words, we only need an array of values with length equal to the number of pixels along the x-axis.
+So let's pare down this data. We don't reasonably need more data than we can display on the screen. In other words, we only need an array of values with length equal to the number of pixels along the x-axis.
 
 ```javascript
-function boil( data, pixels ) {
+function summarize( data, pixels ) {
   var pixelLength = Math.round(data.length/pixels);
   var vals = [];
 
@@ -51,58 +54,102 @@ function boil( data, pixels ) {
 
 ##Rendering
 
-Now let's use our <code>boil</code> function along with d3 to draw the waveform:
+First I gave it the old college try:
 
 ```javascript
-function render(data, containerEl) {
-  // Vertical scale
-  var multiplier = 500;
-
-  d3.select( containerEl )
+function render1() {
+  var multiplier = 100;
+  var summary = summarize(data, 100);
+  d3.select('#ex1')
     .selectAll('div')
-    // boil down the large array into a 100px result
-    .data( boil( data, 100 ) )
+    .data( summary )
     .enter()
     .append('div')
-
-    // Height should be the sum of the negative and positive values
-    .style('height', function( point ) {
-      var sum = point[1] - point[0];
+    .style('height', function( pt ) {
+      var sum = pt[1] - pt[0];
       return sum * multiplier + 'px';
-    })
-
-    // Distance from top should be the height of the positive value
-    .style('margin-top'), function( point ) {
-      return -point[1] * multiplier + 'px';
     });
 }
 ```
 
-##Results
+Resulting in:
+<div id='ex1'></div>
+<br>
+Not bad--obviously we're looking at audio data. But it's not symmetrical. Let's center those lines:
 
-Incorporating this logic into my <code>RegionView</code>, here's what pops out:
+```javascript
+function render2() {
+  var multiplier = 100;
+  var summary = summaraize(data, 200);
+  d3.select('#ex1')
+    .selectAll('div')
+    .data( summary )
+    .enter()
+    .append('div')
+    .style('height', function( pt ) {
+      var sum = pt[1];
+      return sum * multiplier + 'px';
+    })
+    // 
+    .style('margin-top', function( pt ) {
+      var sum = pt[1]/2;
+      return - sum * multiplier + 'px';
+    });
+}
+```
 
-<center>
-<img src='waveform.png' style='width:300px'>
-</center>
+Result:
+<div id='ex2'></div>
+<br>
+Even better. However, we're not really being honest here because we're just mirroring the waveform, ignoring the 50% of the data beneath zero. (Now you can see why <code>summarize</code> tallies positive and negative datapoints separately.)
 
-Looks pretty darn good to me!
+```javascript
+function render3() {
+  var multiplier = 200;
+  var summary = summarize(data, 300);
+  d3.select('#ex3')
+    .selectAll('div')
+    .data( summary )
+    .enter()
+    .append('div')
+    .style('height', function( pt ) {
+      var sum = pt[1] - pt[0];
+      return sum * multiplier + 'px';
+    })
+    .style('margin-top', function( pt ) {
+      return - pt[1] * multiplier + 'px';
+    });
+}
+```
+
+Result:
+
+
+<div id='ex3'></div>
+<br>
+
+Ahh. Pleasantly imperfect. This is the algorithm I pretty much stuck with.
+
+
 
 ##Further considerations
 
-###Scaling
 
-The biggest problem with the above is that we're cycling through the entire audio data array, which may be many million datapoints long.
+###Performance
 
-Luckily, regardless of the input array size, the information we want to render is only as large as the number of pixels we want to display it on. So, for longer clips, we can throw out most of the data:
+Now, keep in mind that it took my modest machine under 10ms to draw each of these waveforms. The way my original <code>summarize</code> code is written, however, that duration will scale with audio clip length--the majority of the processing time is spent looping through the audio clip. 
+
+But luckily we aren't concerned with what each individual audio frame says--we just want enough of a snapshot to draw an accurate pixel. In other words, rendering audio waveforms should be limited by the dimensions of the rendering, not the length of the clip.
 
 ```javascript
-function boil( data, pixels ) {
+function summarizeFaster( data, pixels ) {
   var pixelLength = Math.round(data.length/pixels);
   var vals = [];
 
-  // 1000 datapoints / second
-  var sampleEvery = 44;
+  // Define a minimum sample size per pixel
+  var maxSampleSize = 1000;
+  sampleSize = Math.min(pixelLength, maxSampleSize);
+
 
   // For each pixel we display
   for (var i = 0; i < pixels; i++) {
@@ -110,11 +157,9 @@ function boil( data, pixels ) {
       negSum = 0;
 
     // Cycle through the data-points relevant to the pixel
-    for (var j = 0; j < pixelLength; j++) {
-      var index = i * pixelLength + j;
-      if ( index % sampleEvery !== 0 ) {
-        continue;
-      var val = data[ index ];
+    // Don't cycle through more than sampleSize frames per pixel.
+    for (var j = 0; j < sampleSize; j++) {
+      var val = data[ i * pixelLength + j ];
 
       // Keep track of positive and negative values separately
       if (val > 0) {
@@ -123,11 +168,18 @@ function boil( data, pixels ) {
         negSum += val;
       }
     }
-    vals.push( [ 
-      negSum * sampleEvery / pixelLength, 
-      posSum * sampleEvery / pixelLength 
-    ] );
+    vals.push( [ negSum / pixelLength, posSum / pixelLength ] );
   }
   return vals;
 }
 ```
+
+Results:
+
+<div id='ex4'></div>
+<br>
+
+It looks almost as good and will render audio clips as long as you desire in the same amount of time.
+
+Thanks for reading!
+
