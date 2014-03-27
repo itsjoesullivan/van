@@ -1,114 +1,124 @@
-<!doctype html>
-<html>
-<head>
-  <link rel="stylesheet" href="/van/style.css" />
-</head>
-<body>
-<h1>Defining global scripts in NPM</h1>
+<p><meta name="viewport" content="width=device-width, initial-scale=1"></p>
+<p><link rel='stylesheet' href='/van/style.css'></p>
+<p><link rel='stylesheet' href='/van/lib/highlightjs-8.0.css'></p>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-31945659-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+<p><script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script></p>
+<p><script type="text/javascript" src='/van/script.js'></script></p>
+<h1 id="defining-global-scripts-in-npm">Defining global scripts in NPM</h1>
 <p>I&#39;ve never quite known the proper way to declare a global script within an npm module. The <a href="https://npmjs.org/doc/json.html#bin">docs</a> aren&#39;t exactly hazy, but I conducted a little survey, below, to grok the overall practice.  A brief wrapup follows.</p>
-<h2>Express</h2>
+<h2 id="express">Express</h2>
 <p>The meat of the app exists in <code>./bin/express</code>, which freely requires scripts with paths relative to itself.</p>
-<h3><a href="https://github.com/visionmedia/express/blob/master/package.json">package.json</a></h3>
-<pre><code class="lang-json">&quot;bin&quot;: {
-  &quot;express&quot;: &quot;./bin/express&quot;
+<h3 id="-package-json-https-github-com-visionmedia-express-blob-master-package-json-"><a href="https://github.com/visionmedia/express/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json"><span class="hljs-string">"bin"</span>: {
+  <span class="hljs-string">"express"</span>: <span class="hljs-string">"./bin/express"</span>
 }</code></pre>
-<h3><a href="https://github.com/visionmedia/express/blob/master/bin/express">./bin/express&quot;</a></h3>
-<pre><code class="lang-bash">#!/usr/bin/env node
+<h3 id="-bin-express-https-github-com-visionmedia-express-blob-master-bin-express-"><a href="https://github.com/visionmedia/express/blob/master/bin/express">./bin/express&quot;</a></h3>
+<pre><code class="lang-bash"><span class="hljs-shebang">#!/usr/bin/env node</span>
 # [...]</code></pre>
-<h2>Grunt</h2>
+<h2 id="grunt">Grunt</h2>
 <p>Uses precisely the same pattern as express</p>
-<h3><a href="https://github.com/gruntjs/grunt-cli/blob/master/package.json">package.json</a></h3>
-<pre><code class="lang-json">&quot;bin&quot;: {
-    &quot;grunt&quot;: &quot;bin/grunt&quot;
+<h3 id="-package-json-https-github-com-gruntjs-grunt-cli-blob-master-package-json-"><a href="https://github.com/gruntjs/grunt-cli/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json"><span class="hljs-string">"bin"</span>: {
+    <span class="hljs-string">"grunt"</span>: <span class="hljs-string">"bin/grunt"</span>
 }</code></pre>
-<h3><a href="https://github.com/gruntjs/grunt-cli/blob/master/bin/grunt">bin/grunt</a></h3>
-<pre><code class="lang-bash">#!/usr/bin/env node
+<h3 id="-bin-grunt-https-github-com-gruntjs-grunt-cli-blob-master-bin-grunt-"><a href="https://github.com/gruntjs/grunt-cli/blob/master/bin/grunt">bin/grunt</a></h3>
+<pre><code class="lang-bash"><span class="hljs-shebang">#!/usr/bin/env node</span>
 # [...]</code></pre>
-<h2>mocha</h2>
+<h2 id="mocha">mocha</h2>
 <p>Mocha mixes things up a bit. &quot;mocha&quot; does little but execute &quot;node ./_mocha&quot;, except when certain commands would modify node instead of mocha, i.e. &quot;node debug _mocha&quot;. <a href="https://github.com/visionmedia/mocha/compare/221a3c049ed3a943ce36fd0a4ffe0e23acbb7cab...6fa9d8ae889a">It wasn&#39;t always that way</a>.</p>
-<h3><a href="https://github.com/visionmedia/mocha/blob/master/package.json">package.json</a></h3>
-<pre><code class="lang-json">  &quot;bin&quot;: {
-    &quot;mocha&quot;: &quot;./bin/mocha&quot;,
-      &quot;_mocha&quot;: &quot;./bin/_mocha&quot;
+<h3 id="-package-json-https-github-com-visionmedia-mocha-blob-master-package-json-"><a href="https://github.com/visionmedia/mocha/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json">  <span class="hljs-string">"bin"</span>: {
+    <span class="hljs-string">"mocha"</span>: <span class="hljs-string">"./bin/mocha"</span>,
+      <span class="hljs-string">"_mocha"</span>: <span class="hljs-string">"./bin/_mocha"</span>
   }</code></pre>
-<h3><a href="https://github.com/visionmedia/mocha/blob/master/bin/mocha">./bin/mocha</a></h3>
-<pre><code class="lang-bash">#!/usr/bin/env node
+<h3 id="-bin-mocha-https-github-com-visionmedia-mocha-blob-master-bin-mocha-"><a href="https://github.com/visionmedia/mocha/blob/master/bin/mocha">./bin/mocha</a></h3>
+<pre><code class="lang-bash"><span class="hljs-comment">#!/usr/bin/env node</span>
 /**
- * This tiny wrapper file checks for known node flags and appends them
- * when found, before invoking the &quot;real&quot; _mocha(1) executable.
+ * This tiny wrapper file checks <span class="hljs-keyword">for</span> known node flags and appends them
+ * when found, before invoking the <span class="hljs-string">"real"</span> _mocha(<span class="hljs-number">1</span>) executable.
  */
-// [...]
-args = [ __dirname + &#39;/_mocha&#39; ]
+// [<span class="hljs-keyword">...</span>]
+args = [ __dirname + <span class="hljs-string">'/_mocha'</span> ]
 /* [building some arguments] */</code></pre>
-<h3><a href="https://github.com/visionmedia/mocha/blob/master/bin/_mocha">./bin/_mocha</a></h3>
+<h3 id="-bin-_mocha-https-github-com-visionmedia-mocha-blob-master-bin-_mocha-"><a href="https://github.com/visionmedia/mocha/blob/master/bin/_mocha">./bin/_mocha</a></h3>
 <pre><code class="lang-bash">#!/usr/bin/env node
 
-/** [familiar..]
+<span class="hljs-javadoc">/** [familiar..]
  * Module dependencies.
- */</code></pre>
-<h2>UglifyJS</h2>
+ */</span></code></pre>
+<h2 id="uglifyjs">UglifyJS</h2>
 <p>Standard.</p>
-<h3><a href="https://github.com/mishoo/UglifyJS/blob/master/package.json">package.json</a></h3>
-<pre><code class="lang-json">&quot;bin&quot;     : {
-  &quot;uglifyjs&quot; : &quot;./bin/uglifyjs&quot;
+<h3 id="-package-json-https-github-com-mishoo-uglifyjs-blob-master-package-json-"><a href="https://github.com/mishoo/UglifyJS/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json"><span class="hljs-string">"bin"</span>     : {
+  <span class="hljs-string">"uglifyjs"</span> : <span class="hljs-string">"./bin/uglifyjs"</span>
 }</code></pre>
-<h3><a href="https://github.com/mishoo/UglifyJS/blob/master/bin/uglifyjs">./bin/uglifyjs</a></h3>
-<pre><code class="lang-bash">#!/usr/bin/env node
+<h3 id="-bin-uglifyjs-https-github-com-mishoo-uglifyjs-blob-master-bin-uglifyjs-"><a href="https://github.com/mishoo/UglifyJS/blob/master/bin/uglifyjs">./bin/uglifyjs</a></h3>
+<pre><code class="lang-bash"><span class="hljs-comment">#!/usr/bin/env node</span>
 
-[...]</code></pre>
-<h2>browserify</h2>
+[<span class="hljs-keyword">...</span>]</code></pre>
+<h2 id="browserify">browserify</h2>
 <p>Similar invocation, with an interesting twist: help files are stored in <code>bin/usage.txt</code> and <code>bin/advanced.txt</code>, offering a pretty neat way to manage usage if not using commanderjs.</p>
-<h3>package.json</h3>
-<pre><code class="lang-json">&quot;bin&quot;: {
-  &quot;browserify&quot;: &quot;bin/cmd.js&quot;
+<h3 id="package-json">package.json</h3>
+<pre><code class="lang-json"><span class="hljs-string">"bin"</span>: {
+  <span class="hljs-string">"browserify"</span>: <span class="hljs-string">"bin/cmd.js"</span>
 }</code></pre>
-<h3><a href="https://github.com/substack/node-browserify/blob/master/bin/cmd.js">bin/cmd.js</a></h3>
-<pre><code class="lang-bash">#!/usr/bin/env node
-var fs = require(&#39;fs&#39;);
-[...]</code></pre>
-<h2>jshint</h2>
+<h3 id="-bin-cmd-js-https-github-com-substack-node-browserify-blob-master-bin-cmd-js-"><a href="https://github.com/substack/node-browserify/blob/master/bin/cmd.js">bin/cmd.js</a></h3>
+<pre><code class="lang-bash"><span class="hljs-comment">#!/usr/bin/env node</span>
+var fs = <span class="hljs-keyword">require</span>(<span class="hljs-string">'fs'</span>);
+[<span class="hljs-keyword">...</span>]</code></pre>
+<h2 id="jshint">jshint</h2>
 <p>jshint is the first on this list that has a one-liner bash script. Still, it invokes <code>../src/cli.js</code>.</p>
-<h3><a href="https://github.com/jshint/jshint/blob/master/package.json">package.json</a></h3>
-<pre><code class="lang-json">&quot;bin&quot;: {
-  &quot;jshint&quot;: &quot;./bin/jshint&quot;
+<h3 id="-package-json-https-github-com-jshint-jshint-blob-master-package-json-"><a href="https://github.com/jshint/jshint/blob/master/package.json">package.json</a></h3>
+<pre><code class="lang-json"><span class="hljs-string">"bin"</span>: {
+  <span class="hljs-string">"jshint"</span>: <span class="hljs-string">"./bin/jshint"</span>
 }</code></pre>
-<h3><a href="https://github.com/jshint/jshint/blob/master/bin/jshint">./bin/jshint</a></h3>
-<pre><code class="lang-bash">#!/usr/bin/env node
+<h3 id="-bin-jshint-https-github-com-jshint-jshint-blob-master-bin-jshint-"><a href="https://github.com/jshint/jshint/blob/master/bin/jshint">./bin/jshint</a></h3>
+<pre><code class="lang-bash"><span class="hljs-shebang">#!/usr/bin/env node</span>
 
-require(&quot;../src/cli.js&quot;).interpret(process.argv);</code></pre>
-<h3><a href="https://github.com/jshint/jshint/blob/master/src/cli.js">../src/cli.js</a></h3>
-<pre><code class="lang-javascript">// [...]
+require(<span class="hljs-string">"../src/cli.js"</span>).interpret(process.argv);</code></pre>
+<h3 id="-src-cli-js-https-github-com-jshint-jshint-blob-master-src-cli-js-"><a href="https://github.com/jshint/jshint/blob/master/src/cli.js">../src/cli.js</a></h3>
+<pre><code class="lang-javascript">// [<span class="hljs-keyword">...</span>]
 var OPTIONS = {
-    &quot;config&quot;: [&quot;c&quot;, &quot;Custom configuration file&quot;, &quot;string&quot;, false ],
-    //[...]</code></pre>
-<h2>Wrapup</h2>
+    <span class="hljs-string">"config"</span>: [<span class="hljs-string">"c"</span>, <span class="hljs-string">"Custom configuration file"</span>, <span class="hljs-string">"string"</span>, false ],
+    //[<span class="hljs-keyword">...</span>]</code></pre>
+<h2 id="wrapup">Wrapup</h2>
 <ol>
 <li><p>The common method of creating a global command is to define it in <code>package.json</code> like so:</p>
 <p> <strong>package.json</strong></p>
-<pre><code class="lang-json"> &quot;bin&quot;: {
-   &quot;{commandName}&quot;: &quot;bin/{fileName}&quot;
+<pre><code class="lang-json"> <span class="hljs-string">"bin"</span>: {
+   <span class="hljs-string">"{commandName}"</span>: <span class="hljs-string">"bin/{fileName}"</span>
  }</code></pre>
 <p> The <a href="https://npmjs.org/doc/json.html#bin">npm docs</a> don&#39;t disagree.</p>
 </li>
 <li><p>That script then does the CLI-oriented stuff</p>
 <p> <strong>bin/{fileName}</strong></p>
-<pre><code class="lang-bash"> #!/usr/bin/env node
- var program = require(&#39;commander&#39;);
+<pre><code class="lang-bash"> #!<span class="hljs-regexp">/usr/</span>bin/env node
+ <span class="hljs-keyword">var</span> program = <span class="hljs-built_in">require</span>(<span class="hljs-string">'commander'</span>);
  program.parse(process.argv);</code></pre>
 </li>
 <li><p>The script can require files from its package using paths relative to itself</p>
 <p> <strong>bin/{fileName}</strong></p>
-<pre><code class="lang-bash"> #!/usr/bin/env node
- var tool = require(&#39;../lib/tool&#39;);</code></pre>
+<pre><code class="lang-bash"> #!<span class="hljs-regexp">/usr/</span>bin/env node
+ <span class="hljs-keyword">var</span> tool = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/tool'</span>);</code></pre>
 </li>
 <li><p>To easily surface usage/help messages, simply write then as .txt files à la browserify:</p>
 <p> <strong>bin/{fileName}</strong></p>
-<pre><code class="lang-bash"> #!/usr/bin/env node
-   return fs.createReadStream(__dirname + &#39;/advanced.txt&#39;)
+<pre><code class="lang-bash"> <span class="hljs-comment">#!/usr/bin/env node</span>
+   <span class="hljs-keyword">return</span> fs.createReadStream(__dirname + <span class="hljs-string">'/advanced.txt'</span>)
      .pipe(process.stdout)
-     .on(&#39;close&#39;, function () { process.exit(1) })
+     .on(<span class="hljs-string">'close'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span> process.<span class="hljs-keyword">exit</span>(<span class="hljs-number">1</span>) })
    ;</code></pre>
 </li>
 </ol>
-</body>
-</html>

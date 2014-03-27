@@ -7,7 +7,9 @@ var fs = require('fs');
 var exec = require('gulp-exec');
 gulp.task('default', function() {
 
+
   gulp.src('index.md')
+    .pipe(header( fs.readFileSync(__dirname + '/header.md') ) )
     .pipe(md({
       highlight: function(code) {
         return require('highlight.js').highlightAuto(code).value;
@@ -18,18 +20,18 @@ gulp.task('default', function() {
     }))
     .pipe(gulp.dest('./'));
 
-  gulp.src('2014/03/drawing-waveforms/*.md')
+  gulp.src('201*/**/*.md')
     .pipe(header( fs.readFileSync(__dirname + '/header.md') ) )
     .pipe(md({
       highlight: function(code) {
         return require('highlight.js').highlightAuto(code).value;
       }
     }))
-    .pipe(rename({
-      dirname: '2014/03/drawing-waveforms',
-      extname: '.html'
+    .pipe(rename(function(path) {
+      path.extname = '.html';
     }))
     .pipe(gulp.dest('./'));
+
 });
 
 gulp.task('deploy', function() {

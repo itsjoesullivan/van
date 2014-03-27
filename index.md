@@ -1,31 +1,39 @@
 #joesul.li/van
 <link rel='stylesheet' href='/van/style.css'>
 
-This spring: meet [schroeder](/van/schroeder)
+Web development; music tech.
+
+[resume](https://docs.google.com/document/d/1JE7qJlVuqk2dbld0YrL1YC-igMFYJwon7iIsEujNJ9Q/edit)
+
+##News
+Spring 2014: meet [schroeder](/van/schroeder)
 
 
-### Components
+##Writing
 
-<li>[thread](https://github.com/itsjoesullivan/thread)</li>
+[Drawing Audio Waveforms with D3.js](/van/2014/03/drawing-waveforms/)
 
-  A sane approach to web workers
+[Defining global scripts in NPM](http://localhost:9000/van/2013/08/npm-bin.html)
 
-<li>[recorderjs](https://github.com/itsjoesullivan/recorderjs)</li>
 
-  Web workers for heavy-lifting of audio buffers, as a component.
+##Open source
 
-<li>[js-vim](https://github.com/itsjoesullivan/js-vim)</li>
+[thread](https://github.com/itsjoesullivan/thread) - A sane approach to web workers
 
-    ```javascript
-    vim = new Vim();
-    vim.exec('ihello, world');
-    vim.text();
-    // "hello, world"
-    ```
+[recorderjs](https://github.com/itsjoesullivan/recorderjs) - Web workers for heavy-lifting of audio buffers, as a component.
 
-<li>[json2html](https://github.com/addthis/json2html)</li>
+[js-vim](https://github.com/itsjoesullivan/js-vim) - Something like vim in the browser
 
-    ```javascript
-    json2html({ "div.name-tag": "Hello, World" })
-    // <div class="name-tag">Hello, World</div>
-    ```
+```javascript
+vim = new Vim();
+vim.exec('ihello, world');
+vim.text();
+// "hello, world"
+```
+
+[json2html](https://github.com/addthis/json2html) - Elegant templates in .js
+
+```javascript
+json2html({ "div.name-tag": "Hello, World" })
+// <div class="name-tag">Hello, World</div>
+```
