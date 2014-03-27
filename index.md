@@ -1,7 +1,7 @@
 #joesul.li/van
 <link rel='stylesheet' href='/van/style.css'>
 
-Web development; music technology; 
+Web development; music technology
 
 
 ##News
