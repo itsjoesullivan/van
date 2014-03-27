@@ -1,9 +1,8 @@
 #joesul.li/van
 <link rel='stylesheet' href='/van/style.css'>
 
-Web development; music tech.
+Web development; music technology; 
 
-[resume](https://docs.google.com/document/d/1JE7qJlVuqk2dbld0YrL1YC-igMFYJwon7iIsEujNJ9Q/edit)
 
 ##News
 Spring 2014: meet [schroeder](/van/schroeder)
