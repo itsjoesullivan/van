@@ -12,7 +12,7 @@ Spring 2014: meet [schroeder](/van/schroeder)
 
 [Drawing Audio Waveforms with D3.js](/van/2014/03/drawing-waveforms/)
 
-[Defining global scripts in NPM](http://localhost:9000/van/2013/08/npm-bin.html)
+[Defining global scripts in NPM](/van/2013/08/npm-bin.html)
 
 
 ##Open source
