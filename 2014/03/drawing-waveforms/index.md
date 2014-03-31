@@ -184,3 +184,16 @@ Results:
 <br>
 
 It looks almost as good and will render audio clips of any length quickly.
+
+## Anti-aliasing
+
+At least I think that's what it's called. Below are two versions of the previous dataset. The first is rendered precisely as above. The second uses some anti-aliasing by rendering the top and bottom pixel of each sample "grey", according to the actual remainder value. I'm pretty impressed.
+
+<br>
+
+<div id='ex5a'></div>
+<br>
+<br>
+
+<div id='ex5b'></div>
+<br>

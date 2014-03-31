@@ -1,10 +1,10 @@
-#ex1, #ex2, #ex3, #ex4 {
+#ex1, #ex2, #ex3, #ex4, #ex5a, #ex5b {
   display: block;
   margin: auto;
   width: 300px;
   margin-bottom: 4em;
 }
-#ex1 div, #ex2 div, #ex3 div, #ex4 div {
+#ex1 div, #ex2 div, #ex3 div, #ex4 div, #ex5a div, #ex5b div {
   width: 1px;
   position:relative;
   float: left;
