@@ -161,10 +161,42 @@ Even better. However, we&#39;re not really being honest here because we&#39;re j
 <br></p>
 <p>It looks almost as good and will render audio clips of any length quickly.</p>
 <h2 id="anti-aliasing">Anti-aliasing</h2>
-<p>At least I think that&#39;s what it&#39;s called. Below are two versions of the previous dataset. The first is rendered precisely as above. The second uses some anti-aliasing by rendering the top and bottom pixel of each sample &quot;grey&quot;, according to the actual remainder value. I&#39;m pretty impressed.</p>
+<p>At least I think that&#39;s what it&#39;s called. Below are two versions of the previous dataset. The first is rendered precisely as above. The second uses some anti-aliasing by rendering the top and bottom pixel of each sample &quot;grey&quot;, corresponding to the actual decimal remainder value accorded to the top/bottom pixels. I&#39;m pretty impressed.</p>
 <p><br></p>
 <p><div id='ex5a'></div>
 <br>
 <br></p>
 <p><div id='ex5b'></div>
 <br></p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">render5</span><span class="hljs-params">()</span> {</span>
+  <span class="hljs-keyword">var</span> multiplier = <span class="hljs-number">200</span>;
+  <span class="hljs-keyword">var</span> summary = summarizeFaster(data, <span class="hljs-number">300</span>);
+  d3.select(<span class="hljs-string">'#ex5b'</span>)
+    .selectAll(<span class="hljs-string">'div'</span>)
+    .data( summary )
+    .enter()
+    .append(<span class="hljs-string">'div'</span>)
+    .style(<span class="hljs-string">'height'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      <span class="hljs-keyword">var</span> sum = pt[<span class="hljs-number">1</span>] - pt[<span class="hljs-number">0</span>];
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Math</span>.floor(sum * multiplier - <span class="hljs-number">2</span>) + <span class="hljs-string">'px'</span>;
+    })
+    .style(<span class="hljs-string">'margin-top'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      <span class="hljs-keyword">return</span> - <span class="hljs-built_in">Math</span>.floor(pt[<span class="hljs-number">1</span>] * multiplier) + <span class="hljs-string">'px'</span>;
+    })
+    .style(<span class="hljs-string">'border-top'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      <span class="hljs-keyword">var</span> remainder = pt[<span class="hljs-number">1</span>] * multiplier % <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">var</span> val = <span class="hljs-built_in">Math</span>.floor( (<span class="hljs-number">1</span> - remainder) * <span class="hljs-number">256</span> );
+      <span class="hljs-keyword">var</span> str = <span class="hljs-string">'1px solid rgb('</span> + 
+        val + <span class="hljs-string">','</span> + val + <span class="hljs-string">','</span> + val + 
+      <span class="hljs-string">')'</span>;
+      <span class="hljs-keyword">return</span> str;
+    })
+    .style(<span class="hljs-string">'border-bottom'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( pt )</span> {</span>
+      <span class="hljs-keyword">var</span> remainder = <span class="hljs-built_in">Math</span>.abs(pt[<span class="hljs-number">0</span>] * multiplier % <span class="hljs-number">1</span>);
+      <span class="hljs-keyword">var</span> val = <span class="hljs-built_in">Math</span>.floor( (<span class="hljs-number">1</span> - remainder) * <span class="hljs-number">256</span> );
+      <span class="hljs-keyword">var</span> str = <span class="hljs-string">'1px solid rgb('</span> + 
+        val + <span class="hljs-string">','</span> + val + <span class="hljs-string">','</span> + val + 
+      <span class="hljs-string">')'</span>;
+      <span class="hljs-keyword">return</span> str;
+    })
+}</code></pre>
