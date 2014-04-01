@@ -38,7 +38,6 @@ gulp.task('deploy', function() {
   gulp.src('index.html')
     .pipe(exec('gulp'))
     .pipe(exec('git add -A'))
-    //.pipe(exec('git commit -m "' + (new Date()) + ' deploy"') )
-    .pipe(exec('git commit -m "hi"') )
+    .pipe(exec('git commit -m "' + (new Date()) + ' deploy"') )
     .pipe(exec('git push') );
 });
