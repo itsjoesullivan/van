@@ -14,8 +14,6 @@ Spring 2014: meet [schroeder](/van/schroeder)
 
 [Defining global scripts in NPM](/van/2013/08/npm-bin.html)
 
-hi
-
 ##Open source
 
 [thread](https://github.com/itsjoesullivan/thread) - A sane approach to web workers
