@@ -8,5 +8,4 @@ Scat is a tool for songwriters. I polled my songwriter friends about their proce
 - They record musical ideas on a tape recorder
 - The difficulty of managing/organizing these dual media gets in the way of progress
 
-So scat.io provides a 
-It doesn't take a rocket scientist to see that 
+So scat.io provides a home for both. Have a lyric idea? Write it down in a scat doc. Want to record a melody? Record that idea in the very same document.
