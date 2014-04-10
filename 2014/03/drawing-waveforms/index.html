@@ -200,3 +200,32 @@ Even better. However, we&#39;re not really being honest here because we&#39;re j
       <span class="hljs-keyword">return</span> str;
     })
 }</code></pre>
+<h2 id="svg">SVG</h2>
+
+<p>Ok, you may be wondering why I haven&#39;t been drawing these as SVGs the whole time. Well, I hadn&#39;t quite figured SVGs out yet. But after a a few minutes with <a href="http://alignedleft.com/tutorials/d3/drawing-svgs">Scott Murray&#39;s great D3 tutorial</a> I am feeling more comfortable with them. Here&#39;s the SVG version. I draw at twice the resolution as before and my aliasing concerns are behind me.</p>
+<pre><code class="lang-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">renderSVG</span><span class="hljs-params">()</span> {</span>
+  <span class="hljs-keyword">var</span> summary = summarizeFaster(data, <span class="hljs-number">600</span>);
+  <span class="hljs-keyword">var</span> multiplier = <span class="hljs-number">200</span>;
+  <span class="hljs-keyword">var</span> w = <span class="hljs-number">0.5</span>;
+  d3.select(<span class="hljs-string">'#ex6'</span>)
+    .append(<span class="hljs-string">'svg'</span>)
+    .attr(<span class="hljs-string">'width'</span>, <span class="hljs-number">300</span>)
+    .attr(<span class="hljs-string">'height'</span>, <span class="hljs-number">150</span>)
+    .selectAll(<span class="hljs-string">'circle'</span>)
+    .data( summary )
+    .enter()
+      .append(<span class="hljs-string">'rect'</span>)
+      .attr(<span class="hljs-string">'x'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(d, i)</span> {</span>
+        <span class="hljs-keyword">return</span> ( i * w ) + <span class="hljs-number">25</span>;
+      })
+      .attr(<span class="hljs-string">'y'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(d, i)</span> {</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-number">50</span> - (multiplier * d[<span class="hljs-number">1</span>] );
+      })
+      .attr(<span class="hljs-string">'width'</span>, w)
+      .attr(<span class="hljs-string">'height'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(d)</span> {</span>
+        <span class="hljs-keyword">return</span> multiplier*(d[<span class="hljs-number">1</span>] - d[<span class="hljs-number">0</span>]);
+      });
+}</code></pre>
+<p>Tadaaa:</p>
+<p><div id='ex6'></div>
+<br></p>

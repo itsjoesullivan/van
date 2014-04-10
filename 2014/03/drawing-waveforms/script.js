@@ -22,6 +22,7 @@ var init = function() {
   var startTime = new Date();
   render4();
   render5();
+  renderSVG();
   console.log(Date.now() - startTime);
 };
 
@@ -131,6 +132,30 @@ function render5() {
       var str = '1px solid rgb(' + val + ',' + val + ',' + val + ')';
       return str;
     })
+}
+
+function renderSVG() {
+  var summary = summarizeFaster(data, 600);
+  var multiplier = 200;
+  var w = 0.5;
+  d3.select('#ex6')
+    .append('svg')
+    .attr('width', 300)
+    .attr('height', 150)
+    .selectAll('circle')
+    .data( summary )
+    .enter()
+      .append('rect')
+      .attr('x', function(d, i) {
+        return ( i * w ) + 25;
+      })
+      .attr('y', function(d, i) {
+        return 50 - (multiplier * d[1] );
+      })
+      .attr('width', w)
+      .attr('height', function(d) {
+        return multiplier*(d[1] - d[0]);
+      });
 }
 
 

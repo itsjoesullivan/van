@@ -1,4 +1,4 @@
-#ex1, #ex2, #ex3, #ex4, #ex5a, #ex5b {
+#ex1, #ex2, #ex3, #ex4, #ex5a, #ex5b, #ex6 {
   display: block;
   margin: auto;
   width: 300px;
@@ -10,4 +10,8 @@
   float: left;
   display: inline;
   background-color: #333;
+}
+
+#ex6 rect {
+  fill: #333;
 }
