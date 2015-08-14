@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="style.css" />
+<title>A Tale of No Clocks | Joe Sullivan</title>
+</head>
+<body>
+<header>
+<a href="http://joesul.li/van">joesul.li/van</a>
+</header>
+<article>
+  <h1>A Tale of No Clocks</h1>
+  <p class="byline">By <a href="https://twitter.com/itsjoesullivan" target="_blank">Joe Sullivan</a></p>
+  <p class="no-indent"><i>Disclaimer: Ok, there's a clock involved.</i></p>
+  <h2>Introduction</h2>
+  <p>
+    <a href="https://twitter.com/cwilso" target="_blank">Chris Wilson</a>'s <a href="http://www.html5rocks.com/en/tutorials/audio/scheduling" target="_blank">A Tale of Two Clocks</a> is the primer for managing the scheduling web audio events in the browser UI thread. Because web audio lives in its own thread with its own timeline, and because it's impossible to be sure exactly when code in the UI thread will execute, it's important for the UI thread to schedule audio events ahead of time. <i>A Tale of Two Clocks</i> explains how to do that using <code>setInterval</code> to ensure rock-solid timing (so long as the UI thread is running at all).
+  </p>
+  <p>
+    There are other approaches to scheduling audio events, though. For instance, instead of periodically scheduling events you could schedule all of your events at once, then cancel them (one way or another) when stopping playback. This method doesn't work for loops (the scheduling of which would create... an infinite loop), but it has the advantage of not relying on the UI thread at all. And that <em>is</em> an advantage when it comes to browser windows that are in the background. UI thread execution slows to a crawl in the background, screwing up even the most solid timing scheme that relies on it.
+  </p>
+  <p>
+    This article talks about a variation of the all-at-once scheduling strategy that works particularly well with loops and avoids on-going interaction with the UI thread. It does it with the help of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext" target="_blank"><code>OfflineAudioContext</code></a>.
+  </p>
+  <h2>The Scheme</h2>
+  <p>
+    The idea is to schedule all events in an <code>OfflineAudioContext</code>, render that context into an <code>AudioBuffer</code>, and play that buffer in the regular <code>AudioContext</code>.
+  </p>
+  <p>If you're working with a loop specifically (drum machines and sequencers fall into this category), you can then loop this rendered buffer (by operating on the <code>AudioBufferSourceNode</code>), creating a continuous audio signal that never needs topping-up from the UI thread.
+  <p>
+    An example of the idea in action is below. Its source code is available <a href="script.js" target="_blank">here</a>, though much if it will reappear below. But first, we should back up a bit and talk about the <code>OfflineAudioContext</code>.
+  </p>
+  <h2>OfflineAudioContext</h2>
+  <p>
+    The <code>OfflineAudioContext</code> doesn't get talked about much, but it's really awesome. It's just like the AudioContext you already know, except that it has a <code>startRendering</code> method. Your workflow with an AudioContext is to schedule events along its timeline, then hear them. These two steps are so connected that it's easy to think that they are one and the same. (Thankfully, they aren't, and that's why the first argument passed to any <code>start</code> method is a <b>when</b> parameter, though leaving it out usually signifies "now"). However, in an <em>offline</em> audio context, these steps are explicitly separated: first, you schedule all of your audio events, then you call <code>startRendering</code>, which resolves with an <code>AudioBuffer</code> containing all of your audio events.
+  </p>
+<pre class="example">
+<code class="javascript">
+/**
+ * Return a promise that resolves with an AudioBuffer that is your
+ * input buffer after being filtered.
+ */
+function getFilteredBuffer(buffer) {
+  // OfflineAudioContext needs up-front info:
+  // channels, buffer length, and sampleRate
+  var context = new OfflineAudioContext(buffer.numberOfChannels,
+                                        buffer.duration * buffer.sampleRate,
+                                        buffer.sampleRate);
+  
+  // Familiar graph building
+  var source = context.createBufferSourceNode();
+  source.buffer = buffer;
+  var filter = context.createBiquadFilter();
+  source.connect(filter);
+  filter.connect(context.destination);
+
+  // Familiar event scheduling
+  source.start(0);
+
+  // Magical step
+  return context.startRendering();
+}
+</code>
+</pre>
+  <p>
+    For anyone struggling with the dual UI/Audio clock issue, a little time with offline contexts will help with the concept of multiple timelines, because (from a certain perspective) <code>AudioContext</code>s really act as special instances of <code>OfflineAudioContext</code>s where the timeline happens to coincide with <em>our</em> timeline.
+  </p>
+  <h2>Example Drum Machine</h2>
+  <p>Here is a drum machine that operates on the principles described above.</p>
+  <div id="app" ng-app="drumMachineApp" ng-controller="RhythmCtrl">
+    <div ng-repeat="pattern in rhythm.patterns">
+      <label>{{ pattern.sound }}</label>
+      <span ng-class="{cursor: Math.floor(cursor) === $index}" ng-repeat="beat in pattern.beats track by $index">
+        <input type="checkbox"
+          ng-model="tmp"
+          ng-change="patternChange(pattern.sound, $index)"
+          ng-checked="beat > 0" />
+      </span>
+      <br />
+    </div>
+    <input type="number" ng-model="tempo" ng-change="tempoChange()"/>
+    <br />
+    <button ng-click="play()" >Play</button>
+    <button ng-click="pause()" >Pause</button>
+    <button ng-click="stop()" >Stop</button>
+  </div>
+  <p>
+    When you hit the play button, the drum pattern is rendered into a buffer via an OfflineAudioContext, and that buffer is scheduled into the existing AudioContext. When you change the pattern, a new buffer is rendered representing this new pattern, and it replaces the current buffer. When you change the <em>tempo</em>, the same process occurs. 
+  </p>
+  <h2>General Pattern</h2>
+  <p>
+    Here's what your code might look like if you employ this method:
+  </p>
+<pre class="example">
+<code class="javascript">
+var source;
+
+function play() {
+  renderLoop().then(playLoop);
+}
+
+function pause() {
+  source.stop();
+}
+
+function renderLoop() {
+  // Just a stub—yours will be different. However,
+  // this function should create an OfflineAudioContext,
+  // schedule your loop into the context,
+  // and resolve with the buffer of that context.
+  // It should probably always return something like:
+  // offlineAudioContext.startRendering();
+}
+
+function playLoop(buffer) {
+  source = context.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  source.start(context.currentTime);
+}
+</code>
+</pre>
+  <p>
+    Admittedly, all of the magic happens inside of the <code>renderLoop</code> stub function, but that's the advantage of this pattern: once <code>playLoop</code> has executed, the UI thread is completely done until the next <em>actual user interaction</em>. That means that the drum loop will continue playing regardless of what else happens, including the window being backgrounded.
+  </p>
+  <h2>Complications</h2>
+  <p>
+  </p>
+  <h2>To write</h2>
+  <ul>
+    <li>Keeping UI aware of time (requestAnimationFrame)</li>
+    <li>Should audio work in the background</li>
+    <li>What about a cymbal in the last tick? Should render two measures then loop the 2nd</li>
+  </ul>
+</article>
+<script src="//use.typekit.net/vej1mbp.js"></script>
+<script>try{Typekit.load({ async: true });}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/googlecode.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script src="angular-1.4.3.js"></script>
+<script src="script.js"></script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-31945659-1', 'auto');
+ga('send', 'pageview');
+</script>
+</body>
+</html>

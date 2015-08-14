@@ -1,0 +1,66 @@
+#app {
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+  font-family: monospace;
+}
+
+#app .cursor {
+  background-color: yellow;
+}
+
+#app label {
+  display: inline-block;
+  width: 50px;
+}
+
+#app input[type=number] {
+  margin: 1em;
+}
+
+header a {
+  font-family: monospace;
+}
+
+h1, h2, h3, h4 {
+  font-family: "myriad-pro", sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.4em;
+}
+
+article {
+  margin: auto;
+  max-width: 700px;
+}
+
+p, li {
+  font-family: "minion-pro";
+  font-size: 1.2em;
+  line-height: 1.5em;
+}
+
+p {
+  text-indent: 3em;
+}
+
+p.no-indent {
+  text-indent: 0;
+}
+
+pre.example {
+  border: 1px solid #ccc;
+}
+
+p.byline {
+  text-indent: 0;
+  text-align: right;
+}
