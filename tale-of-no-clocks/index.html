@@ -68,7 +68,9 @@ function getFilteredBuffer(buffer) {
     For anyone struggling with the dual UI/Audio clock issue, a little time with offline contexts will help with the concept of multiple timelines, because (from a certain perspective) <code>AudioContext</code>s really act as special instances of <code>OfflineAudioContext</code>s where the timeline happens to coincide with <em>our</em> timeline.
   </p>
   <h2>Example Drum Machine</h2>
-  <p>Here is a drum machine that operates on the principles described above.</p>
+  <p>
+    Here is a drum machine that operates on the principles described above. Its source code is available <a href="script.js" target="_blank">here</a>.
+  </p>
   <div id="app" ng-app="drumMachineApp" ng-controller="RhythmCtrl">
     <div ng-repeat="pattern in rhythm.patterns">
       <label>{{ pattern.sound }}</label>
@@ -87,7 +89,7 @@ function getFilteredBuffer(buffer) {
     <button ng-click="stop()" >Stop</button>
   </div>
   <p>
-    When you hit the play button, the drum pattern is rendered into a buffer via an OfflineAudioContext, and that buffer is scheduled into the existing AudioContext. When you change the pattern, a new buffer is rendered representing this new pattern, and it replaces the current buffer. When you change the <em>tempo</em>, the same process occurs. 
+    When you hit the play button, the drum pattern is rendered into a buffer via an OfflineAudioContext, and that buffer is scheduled into the existing AudioContext. When you change the pattern, a new buffer is rendered representing this new pattern, and it replaces the current buffer. When you change the <em>tempo</em>, the same process occurs. Each of these renders takes ~10ms.
   </p>
   <h2>General Pattern</h2>
   <p>
@@ -125,15 +127,18 @@ function playLoop(buffer) {
   <p>
     Admittedly, all of the magic happens inside of the <code>renderLoop</code> stub function, but that's the advantage of this pattern: once <code>playLoop</code> has executed, the UI thread is completely done until the next <em>actual user interaction</em>. That means that the drum loop will continue playing regardless of what else happens, including the window being backgrounded.
   </p>
-  <h2>Complications</h2>
-  <p>
+  <h2>Features, Complications, and Considerations</h2>
+  <p>One feature of the pattern is that the drum machine code doesn't use <code>setInterval</code> anywhere. It doesn't need to for the audio, and the visual rendering is handled inside a <code>requestAnimationFrame</code> call.
   </p>
-  <h2>To write</h2>
+  <p>
+    Freeing our UI thread of any responsibility for scheduling events doesn't mean it isn't responsible for visually displaying what's going on, yet we don't have much of a handle on what <em>is</em> going on. Implementing the drum machine above, a surprising amount of the code is devoted to keeping an accurate, independent representation of where we are in the loop (I call it the cursor). This code lives in three primary places: the <code>play</code> function, the <code>pause</code> function, and the (visual) render function.
+  </p>
+
+  <!--h2>To write</h2>
   <ul>
-    <li>Keeping UI aware of time (requestAnimationFrame)</li>
     <li>Should audio work in the background</li>
     <li>What about a cymbal in the last tick? Should render two measures then loop the 2nd</li>
-  </ul>
+  </ul-->
 </article>
 <script src="//use.typekit.net/vej1mbp.js"></script>
 <script>try{Typekit.load({ async: true });}catch(e){}</script>

@@ -203,6 +203,7 @@ drumMachineApp.controller("RhythmCtrl", function($scope, $q, contextService, aud
       });
       context.startRendering();
       context.oncomplete = function(e) {
+        console.log("Render took " + ($scope.context.currentTime - startTime).toFixed(3) + "s.");
         resolve(e.renderedBuffer);
       };
     });
