@@ -94,7 +94,6 @@ drumMachineApp.controller("RhythmCtrl", function($scope, $q, contextService, aud
   $scope.rhythm = rhythmService.rhythm;
 
   $scope.rhythmLength = $scope.rhythm.patterns[0].beats.length;
-  console.log($scope.rhythmLength);
 
   // Process a change to a pattern
   // TODO: Can ng-model handle this?
