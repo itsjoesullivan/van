@@ -64,6 +64,43 @@ function getFilteredBuffer(buffer) {
 }
 </code>
 </pre>
+<label class="code-explainer">
+  An example of the OfflineAudioContext at work. Warning: the <code>startRendering</code> spec is to return a promise, but currently you need to attach an <code>oncomplete</code> handler (more <a href="https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext" target="_blank">here</a>).
+  <br />
+  <center>
+    <button id="filter-example-raw">Raw sound</button>
+    <button id="filter-example-filtered">getFilteredBuffer</button>
+  </center>
+</label>
+  <script>
+  var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  document.getElementById('filter-example-raw').addEventListener('click', function() {
+    getBuffer('snare.wav').then(function(buffer) {
+      var source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start();
+    });
+  });
+  document.getElementById('filter-example-filtered').addEventListener('click', function() {
+    getBuffer('snare.wav').then(getFilteredBuffer).then(function(buffer) {
+      var source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start();
+    });
+  });
+  function getFilteredBuffer(buffer) {
+    var context = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(buffer.numberOfChannels, buffer.duration * buffer.sampleRate, buffer.sampleRate);
+    var source = context.createBufferSource();
+    source.buffer = buffer;
+    var filter = context.createBiquadFilter();
+    source.connect(filter);
+    filter.connect(context.destination);
+    source.start(0);
+    return context.startRendering();
+  }
+  </script>
   <p>
     For anyone struggling with the dual UI/Audio clock issue, a little time with offline contexts will help with the concept of multiple timelines, because (from a certain perspective) <code>AudioContext</code>s really act as special instances of <code>OfflineAudioContext</code>s where the timeline happens to coincide with <em>our</em> timeline.
   </p>
@@ -76,8 +113,7 @@ function getFilteredBuffer(buffer) {
       <label>{{ pattern.sound }}</label>
       <span ng-class="{cursor: Math.floor(cursor) === $index}" ng-repeat="beat in pattern.beats track by $index">
         <input type="checkbox"
-          ng-model="tmp"
-          ng-change="patternChange(pattern.sound, $index)"
+          ng-click="patternClick(pattern.sound, $index)"
           ng-checked="beat > 0" />
       </span>
       <br />
@@ -96,44 +132,59 @@ function getFilteredBuffer(buffer) {
     Here's what your code might look like if you employ this method:
   </p>
 <pre class="example">
-<code class="javascript">
+<code class="javascript">// Initialize an AudioContext
+var audioContext = new AudioContext();
 var source;
 
+/**
+ * Response to pushing play button
+ */
 function play() {
   renderLoop().then(playLoop);
 }
 
+/**
+ * Response to pushing pause button
+ */
 function pause() {
   source.stop();
 }
 
-function renderLoop() {
-  // Just a stub—yours will be different. However,
-  // this function should create an OfflineAudioContext,
-  // schedule your loop into the context,
-  // and resolve with the buffer of that context.
-  // It should probably always return something like:
-  // offlineAudioContext.startRendering();
-}
+/**
+ * Just a stub—yours will be different. However,
+ * this function should create an OfflineAudioContext,
+ * schedule your loop into the context,
+ * and resolve with the buffer of that context.
+ * It should probably always return something like:
+ * offlineAudioContext.startRendering();
+ */
+function renderLoop() { }
 
+/**
+ * Play the buffer on a loop.
+ */
 function playLoop(buffer) {
   source = context.createBufferSource();
   source.buffer = buffer;
   source.loop = true;
   source.start(context.currentTime);
-}
-</code>
+}</code>
 </pre>
   <p>
-    Admittedly, all of the magic happens inside of the <code>renderLoop</code> stub function, but that's the advantage of this pattern: once <code>playLoop</code> has executed, the UI thread is completely done until the next <em>actual user interaction</em>. That means that the drum loop will continue playing regardless of what else happens, including the window being backgrounded.
+    Admittedly, the magic happens inside of the stubbed-out <code>renderLoop</code> function, but that's the advantage of this pattern: once <code>playLoop</code> has executed, the UI thread is completely done until the next <em>actual user interaction</em>. That means that the drum loop will continue playing regardless of what else happens, including the window being backgrounded.
   </p>
-  <h2>Features, Complications, and Considerations</h2>
-  <p>One feature of the pattern is that the drum machine code doesn't use <code>setInterval</code> anywhere. It doesn't need to for the audio, and the visual rendering is handled inside a <code>requestAnimationFrame</code> call.
-  </p>
+  <h2>Misc</h2>
   <p>
     Freeing our UI thread of any responsibility for scheduling events doesn't mean it isn't responsible for visually displaying what's going on, yet we don't have much of a handle on what <em>is</em> going on. Implementing the drum machine above, a surprising amount of the code is devoted to keeping an accurate, independent representation of where we are in the loop (I call it the cursor). This code lives in three primary places: the <code>play</code> function, the <code>pause</code> function, and the (visual) render function.
   </p>
 
+  <h2>Practical Usage</h2>
+  <p>
+    Where does this rendering method make sense? It might seem like pre-rendering audio like this is tailor-made for use in drum machine situations. However, I think another place that doing this makes sense is in the context of a large-scale DAW, where you have a number of audio channels, each composed of a number of audio events, most of which are static at any given time. Why not render those channels in the background, avoiding 
+  </p>
+  <p>
+    While I do think there are lots of places that pre-rendering works, it does require some understanding of the data model: it works really well for short loops that render quickly, but pre-rendering channels in a 3-minute song will require being smart about when you pre-render. This makes pre-rendering a poor choice for performance-based applications.
+  </p>
   <!--h2>To write</h2>
   <ul>
     <li>Should audio work in the background</li>
@@ -155,5 +206,7 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 ga('create', 'UA-31945659-1', 'auto');
 ga('send', 'pageview');
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.9.0/fetch.min.js"></script>
+<script src="getBuffer.js"></script>
 </body>
 </html>

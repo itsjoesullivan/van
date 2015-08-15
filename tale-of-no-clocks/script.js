@@ -96,11 +96,11 @@ drumMachineApp.controller("RhythmCtrl", function($scope, $q, contextService, aud
   $scope.rhythmLength = $scope.rhythm.patterns[0].beats.length;
 
   // Process a change to a pattern
-  // TODO: Can ng-model handle this?
-  $scope.patternChange = function(sound, index) {
+  $scope.patternClick = function(sound, index) {
     $scope.rhythm.patterns.some(function(pattern) {
       if (pattern.sound === sound) {
         originalVal = pattern.beats[index];
+        console.log(originalVal);
         if (originalVal > 0) {
           pattern.beats[index] = 0;
         } else {

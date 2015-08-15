@@ -42,7 +42,7 @@ article {
   max-width: 700px;
 }
 
-p, li {
+p, li, label {
   font-family: "minion-pro";
   font-size: 1.2em;
   line-height: 1.5em;
@@ -63,4 +63,17 @@ pre.example {
 p.byline {
   text-indent: 0;
   text-align: right;
+}
+
+pre {
+  margin: 0;
+}
+label.code-explainer {
+  display: block;
+  border: 1px solid #ccc;
+  border-top: none;
+  margin-top: 0;
+  text-indent: 1em;
+  font-size: 1em;
+  padding: 0.5em;
 }
