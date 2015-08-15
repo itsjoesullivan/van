@@ -16,21 +16,21 @@
   <p class="no-indent"><i>Disclaimer: Ok, there's a clock involved.</i></p>
   <h2>Introduction</h2>
   <p>
-    <a href="https://twitter.com/cwilso" target="_blank">Chris Wilson</a>'s <a href="http://www.html5rocks.com/en/tutorials/audio/scheduling" target="_blank">A Tale of Two Clocks</a> is the primer for managing the scheduling web audio events in the browser UI thread. Because web audio lives in its own thread with its own timeline, and because it's impossible to be sure exactly when code in the UI thread will execute, it's important for the UI thread to schedule audio events ahead of time. <i>A Tale of Two Clocks</i> explains how to do that using <code>setInterval</code> to ensure rock-solid timing (so long as the UI thread is running at all).
+    <a href="https://twitter.com/cwilso" target="_blank">Chris Wilson</a>'s <a href="http://www.html5rocks.com/en/tutorials/audio/scheduling" target="_blank">A Tale of Two Clocks</a> is the primer for managing the scheduling of web audio events in the browser UI thread. Because web audio lives in its own thread with its own timeline, and because it's impossible to be sure exactly when code in the UI thread will execute, it's important for the UI thread to schedule audio events ahead of time. <i>A Tale of Two Clocks</i> explains how to do that using <code>setInterval</code> to ensure rock-solid timing (so long as the UI thread is running at all).
   </p>
   <p>
     There are other approaches to scheduling audio events, though. For instance, instead of periodically scheduling events you could schedule all of your events at once, then cancel them (one way or another) when stopping playback. This method doesn't work for loops (the scheduling of which would create... an infinite loop), but it has the advantage of not relying on the UI thread at all. And that <em>is</em> an advantage when it comes to browser windows that are in the background. UI thread execution slows to a crawl in the background, screwing up even the most solid timing scheme that relies on it.
   </p>
   <p>
-    This article talks about a variation of the all-at-once scheduling strategy that works particularly well with loops and avoids on-going interaction with the UI thread. It does it with the help of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext" target="_blank"><code>OfflineAudioContext</code></a>.
+    This article talks about a variation of the all-at-once scheduling strategy that works particularly well with loops and avoids on-going interaction with the UI thread. All with the help of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext" target="_blank"><code>OfflineAudioContext</code></a>.
   </p>
-  <h2>The Scheme</h2>
+  <h2>Pre-Rendering Buffers</h2>
   <p>
     The idea is to schedule all events in an <code>OfflineAudioContext</code>, render that context into an <code>AudioBuffer</code>, and play that buffer in the regular <code>AudioContext</code>.
   </p>
   <p>If you're working with a loop specifically (drum machines and sequencers fall into this category), you can then loop this rendered buffer (by operating on the <code>AudioBufferSourceNode</code>), creating a continuous audio signal that never needs topping-up from the UI thread.
   <p>
-    An example of the idea in action is below. Its source code is available <a href="script.js" target="_blank">here</a>, though much if it will reappear below. But first, we should back up a bit and talk about the <code>OfflineAudioContext</code>.
+    An example of the idea in action is below, but first we should back up and talk about the <code>OfflineAudioContext</code>.
   </p>
   <h2>OfflineAudioContext</h2>
   <p>
@@ -102,11 +102,11 @@ function getFilteredBuffer(buffer) {
   }
   </script>
   <p>
-    For anyone struggling with the dual UI/Audio clock issue, a little time with offline contexts will help with the concept of multiple timelines, because (from a certain perspective) <code>AudioContext</code>s really act as special instances of <code>OfflineAudioContext</code>s where the timeline happens to coincide with <em>our</em> timeline.
+    For anyone grappling with the dual UI/Audio clocks, a little time with offline contexts will drive home the concept of multiple timelines, because (from a certain perspective) <code>AudioContext</code>s act as special instances of <code>OfflineAudioContext</code>s where the timeline happens to coincide with <em>our</em> timeline.
   </p>
   <h2>Example Drum Machine</h2>
   <p>
-    Here is a drum machine that operates on the principles described above. Its source code is available <a href="script.js" target="_blank">here</a>.
+    Here is a drum machine that operates on the principles described above. Its source code is available <a href="script.js" target="_blank">here</a>. (<code>renderPattern</code> is where the rendering happens.)
   </p>
   <div id="app" ng-app="drumMachineApp" ng-controller="RhythmCtrl">
     <div ng-repeat="pattern in rhythm.patterns">
@@ -125,10 +125,10 @@ function getFilteredBuffer(buffer) {
     <button ng-click="stop()" >Stop</button>
   </div>
   <p>
-    When you hit the play button, the drum pattern is rendered into a buffer via an OfflineAudioContext, and that buffer is scheduled into the existing AudioContext. When you change the pattern, a new buffer is rendered representing this new pattern, and it replaces the current buffer. When you change the <em>tempo</em>, the same process occurs. Each of these renders takes ~10ms.
+    When you hit the play button, the drum pattern is rendered into a buffer via an OfflineAudioContext, and that buffer is scheduled into the existing AudioContext. When you change the pattern, a new buffer is rendered representing this new pattern, and it replaces the current buffer. When you change the <em>tempo</em>, the same process occurs. Each of these renders takes ~10ms, so you'll hear a glitch if you make a change while a beat is playing; this could be handled better.
   </p>
   <h2>General Pattern</h2>
-  <p>
+  <p class="no-indent">
     Here's what your code might look like if you employ this method:
   </p>
 <pre class="example">
@@ -173,14 +173,13 @@ function playLoop(buffer) {
   <p>
     Admittedly, the magic happens inside of the stubbed-out <code>renderLoop</code> function, but that's the advantage of this pattern: once <code>playLoop</code> has executed, the UI thread is completely done until the next <em>actual user interaction</em>. That means that the drum loop will continue playing regardless of what else happens, including the window being backgrounded.
   </p>
-  <h2>Misc</h2>
   <p>
-    Freeing our UI thread of any responsibility for scheduling events doesn't mean it isn't responsible for visually displaying what's going on, yet we don't have much of a handle on what <em>is</em> going on. Implementing the drum machine above, a surprising amount of the code is devoted to keeping an accurate, independent representation of where we are in the loop (I call it the cursor). This code lives in three primary places: the <code>play</code> function, the <code>pause</code> function, and the (visual) render function.
+    Freeing our UI thread of any responsibility for scheduling events doesn't mean it isn't responsible for visually displaying what's going on, yet we don't have much of a handle on what <em>is</em> going on. Implementing the drum machine above, a surprising amount of the code is devoted to keeping an accurate, independent representation of where we are in the loop (I call it the cursor, and it appears 18 times in ~260 lines of code). This code lives in three primary places: the <code>play</code> function, the <code>pause</code> function, and the (visual) render function.
   </p>
 
   <h2>Practical Usage</h2>
   <p>
-    Where does this rendering method make sense? It might seem like pre-rendering audio like this is tailor-made for use in drum machine situations. However, I think another place that doing this makes sense is in the context of a large-scale DAW, where you have a number of audio channels, each composed of a number of audio events, most of which are static at any given time. Why not render those channels in the background, avoiding 
+    Where does this rendering method make sense? It might seem like pre-rendering audio like this is tailor-made for use in drum machine situations. However, I think another place that doing this makes sense is in the context of a large-scale DAW, where you have a number of audio channels, each composed of a number of audio events, most of which are static at any given time.
   </p>
   <p>
     While I do think there are lots of places that pre-rendering works, it does require some understanding of the data model: it works really well for short loops that render quickly, but pre-rendering channels in a 3-minute song will require being smart about when you pre-render. This makes pre-rendering a poor choice for performance-based applications.

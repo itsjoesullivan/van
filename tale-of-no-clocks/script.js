@@ -11,6 +11,7 @@ drumMachineApp.service('contextService', function() {
 // Something to hold this rhythm
 // TODO: investigate using objects instead of numbers for beats
 drumMachineApp.service('rhythmService', function() {
+  // Lets make it shorter for smaller screens
   if (window.innerWidth < 700) {
     this.rhythm = {
       patterns: [{
