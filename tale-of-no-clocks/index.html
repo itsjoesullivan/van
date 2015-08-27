@@ -101,9 +101,6 @@ function getFilteredBuffer(buffer) {
     return context.startRendering();
   }
   </script>
-  <p>
-    For anyone grappling with the dual UI/Audio clocks, a little time with offline contexts will drive home the concept of multiple timelines, because (from a certain perspective) <code>AudioContext</code>s act as special instances of <code>OfflineAudioContext</code>s where the timeline happens to coincide with <em>our</em> timeline.
-  </p>
   <h2>Example Drum Machine</h2>
   <p>
     Here is a drum machine that operates on the principles described above. Its source code is available <a href="script.js" target="_blank">here</a>. (<code>renderPattern</code> is where the rendering happens.)
@@ -184,7 +181,6 @@ function playLoop(buffer) {
   <p>
     However, pre-rendering buffers requires some understanding of the data model: it works really well for short loops that render quickly, but pre-rendering channels in a 3-minute song will require being smart about when you pre-render. Free-form performance applications aren't good candidates for pre-rendering.
   </p>
-  <hr />
   <!--h2>To write</h2>
   <ul>
     <li>Should audio work in the background</li>
