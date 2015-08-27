@@ -182,8 +182,9 @@ function playLoop(buffer) {
     Where does this rendering method make sense? It might seem like pre-rendering audio like this is tailor-made for use in drum machine situations. However, I think another place that doing this makes sense is in the context of a large-scale DAW, where you have a number of audio channels, each composed of a number of audio events, most of which are static at any given time.
   </p>
   <p>
-    While I do think there are lots of places that pre-rendering works, it does require some understanding of the data model: it works really well for short loops that render quickly, but pre-rendering channels in a 3-minute song will require being smart about when you pre-render. This makes pre-rendering a poor choice for performance-based applications.
+    However, pre-rendering buffers requires some understanding of the data model: it works really well for short loops that render quickly, but pre-rendering channels in a 3-minute song will require being smart about when you pre-render. Free-form performance applications aren't good candidates for pre-rendering.
   </p>
+  <hr />
   <!--h2>To write</h2>
   <ul>
     <li>Should audio work in the background</li>
