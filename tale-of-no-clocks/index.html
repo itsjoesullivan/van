@@ -126,7 +126,7 @@ function getFilteredBuffer(buffer) {
   </p>
   <h2>General Pattern</h2>
   <p class="no-indent">
-    Here's what your code might look like if you employ this method:
+    Here's what your code might look like if you pre-render audio in an OfflineAudioContext:
   </p>
 <pre class="example">
 <code class="javascript">// Initialize an AudioContext
@@ -174,18 +174,16 @@ function playLoop(buffer) {
     Freeing our UI thread of any responsibility for scheduling events doesn't mean it isn't responsible for visually displaying what's going on, yet we don't have much of a handle on what <em>is</em> going on. Implementing the drum machine above, a surprising amount of the code is devoted to keeping an accurate, independent representation of where we are in the loop (I call it the cursor, and it appears 18 times in ~260 lines of code). This code lives in three primary places: the <code>play</code> function, the <code>pause</code> function, and the (visual) render function.
   </p>
 
-  <h2>Practical Usage</h2>
+  <h2>Wrapping Up</h2>
   <p>
     Where does this rendering method make sense? It might seem like pre-rendering audio like this is tailor-made for use in drum machine situations. However, I think another place that doing this makes sense is in the context of a large-scale DAW, where you have a number of audio channels, each composed of a number of audio events, most of which are static at any given time.
   </p>
   <p>
-    However, pre-rendering buffers requires some understanding of the data model: it works really well for short loops that render quickly, but pre-rendering channels in a 3-minute song will require being smart about when you pre-render. Free-form performance applications aren't good candidates for pre-rendering.
+    Still, pre-rendering buffers requires some understanding of the data model: it works really well for short loops that render quickly, but pre-rendering channels in a 3-minute song will require being smart about when you pre-render. This means that free-form performance applications aren't good candidates for pre-rendering.
   </p>
-  <!--h2>To write</h2>
-  <ul>
-    <li>Should audio work in the background</li>
-    <li>What about a cymbal in the last tick? Should render two measures then loop the 2nd</li>
-  </ul-->
+  <p>
+    Nevertheless, where applicable, this approach is a straightforward method of scheduling audio events that doesn't rely on the UI thread outside of actual user interactions.
+  </p>
 </article>
 <script src="//use.typekit.net/vej1mbp.js"></script>
 <script>try{Typekit.load({ async: true });}catch(e){}</script>
