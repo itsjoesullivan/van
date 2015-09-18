@@ -1,7 +1,7 @@
 {
 	"mac": {
 		"version": "0.2.1",
-		"updateUrl": "http://localhost:8080/release/0.2.1/update.zip",
+		"updateUrl": "http://joesul.li/van/drum-machine/release/0.2.1/update.zip",
 		"title": "0.2.1 release",
 		"description": "testing update"
 	}
