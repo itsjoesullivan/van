@@ -1,10 +1,8 @@
 {
 	"mac": {
-		"version": "0.2.0",
-		"updateUrl": "http://joesul.li/van/drum-machine/release/0.2.0/app.nw",
-		"checksum": "5685f26f8b8c24b2c6dae39f7701995d39d8b5e3",
-    "signature": "Ekkt2JNGiVtc5fBm4szCmr95iqMlM3yOVnIm6cYgcM+LgMowhi0673CgRwDb+F0xtA9Vy5v1ra/yypVxcCM60DZQnK5uyPT1PAuF2iagh+WvgQbCSeSXfXho9gWtQBFeaYEmJ9NCmW37oZskv/CDgQrsua0yi/dHXSCwr3rUw0wBY5f+1BBGLNyuRbi1W2cN8d3dW2xM/iloSH9MPBecbwQ0vfd9R7mwAbHEQxByrmH4mJGcnBX4ui1ILHMSMpimJ/waqrcnGBsDZNqW4+/3lN4CFcZjejlveYyY7QYg29CMIHcnNyvX88zlnVy7RSXjh4DuuKE74jeBDHjxf5wcyg==",
-		"title": "0.2.0 release",
+		"version": "0.2.1",
+		"updateUrl": "http://localhost:8080/release/0.2.1/update.zip",
+		"title": "0.2.1 release",
 		"description": "testing update"
 	}
 }
