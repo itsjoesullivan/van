@@ -1,8 +1,8 @@
 {
 	"mac": {
-		"version": "0.3.0",
-		"updateUrl": "http://joesul.li/van/drum-machine/release/0.3.0/update.zip",
-		"title": "0.3.0 release",
+		"version": "0.3.2",
+		"updateUrl": "http://joesul.li/van/drum-machine/release/0.3.2/update.zip",
+		"title": "0.3.2 release",
 		"description": "Initializes react instead of angular."
 	}
 }
