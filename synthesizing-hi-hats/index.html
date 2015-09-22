@@ -1,0 +1,280 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="style.css" />
+<title>Synthesizing Hi-Hats with Web Audio</title>
+</head>
+<body>
+<header>
+<a href="http://joesul.li/van">joesul.li/van</a>
+</header>
+<article>
+  <h1>Synthesizing Hi-Hats with Web Audio</h1>
+  <p class="byline">By <a href="https://twitter.com/itsjoesullivan" target="_blank">Joe Sullivan</a></p>
+  <h2>Introduction</h2>
+  <p>
+    Converting <a>drum-machine</a>'s sounds to synthesized, rather than sampled, sounds, I came across <a>Chris Lowis</a>'s <a href="https://dev.opera.com/articles/drum-sounds-webaudio/">Synthesising Drum Sounds with the Web Audio API</a>, which covers synthesizing drum kick and snare sounds. It stops short of synthesizing the hi-hat, however:
+  </p>
+  <blockquote>
+    Synthesising a realistic-sounding hi-hat is hard. When you strike a disk of metal the sound that is produced is a complex mixture of unevenly-spaced harmonics which decay at different rates. It’s not an impossible task, and if you’re interested there’s some further reading below, but for this post we’re going to cheat a little by sampling an existing sound.
+  </blockquote>
+  <p>
+    Taking a close look at <a href="http://www.soundonsound.com/sos/Aug02/articles/synthsecrets0802.asp">Gordon Reid's Sound On Sound article</a> on hi-hat synthesis, at least synthesizing the tr-808's hi-hat actually seems pretty feasible:
+  </p>
+  <blockquote>
+    ...multiple oscillators are fed through a filter that removes the low frequencies, and through a VCA controlled by a simple contour generator.
+  </blockquote>
+  <p>Sounds simple enough. Let's give it a shot!</p>
+  <h2>The Spec</h2>
+  <p>Reid provides a <a href="http://media.soundonsound.com/sos/aug02/images/figb3tr808hh.l.gif">helpful block diagram</a> of the 808 hi-hat sound, which breaks down to this: six square wave oscillators feed into a bandpass filter, which feeds into a highpass filter, which goes through an envelope amplifier. Somehow, the oscillators and filters simulate the sound of the metal, while the envelope provides the hit, attack, and decay, of the sound.
+  </p>
+  <h2>Square</h2>
+  <p>
+    <i>We're entering the section of the article where there's sounds, so make sure your volume is not too loud.</i>
+  </p>
+  <p>
+    I wouldn't have guessed that the 808 hat is composed of square waves. Here's what they sound like: <button id="square-1">Square wave, 200hz</button>.
+  </p>
+  <p>
+    Let's try to mimic a closed hi-hat's decay: <button id="square-2">Square wave, quick decay</button>
+  </p>
+  <script>
+    context = new AudioContext();
+    document.getElementById("square-1").addEventListener("click", function() {
+      var osc = context.createOscillator();
+      osc.type = "square";
+      osc.frequency.value = 200;
+      osc.start(context.currentTime);
+      osc.stop(context.currentTime + 0.25);
+      var gain = context.createGain();
+      osc.connect(gain);
+      gain.connect(context.destination);
+      gain.gain.value = 0.1;
+    });
+    document.getElementById("square-2").addEventListener("click", function() {
+      var osc = context.createOscillator();
+      osc.type = "square";
+      osc.frequency.value = 200;
+      var gain = context.createGain();
+      osc.connect(gain);
+      gain.connect(context.destination);
+      var now = context.currentTime;
+
+      osc.start(now);
+      osc.stop(now + 0.2);
+      gain.gain.value = 0.1;
+      gain.gain.exponentialRampToValueAtTime(0.000001, now + 0.06);
+    });
+  </script>
+  <p>Yeah... so, somehow six of those will turn into a hi-hat?<p>
+  <h2>Six of Those</h2>
+  <p>Gordon Reid includes one image in his article that displays how these six square waves are arrayed. Below is a little calculator with the root frequency (called fundamental here) plugged in and the ratio of each of the oscillators' frequency to that root. Note, we don't actually synthesize the fundamental.</p>
+  <div id="six-square-calculator">
+    <label>Fundamental:</label> <input type="number" value="40"/>
+    <br />
+    <label>Osc1 ratio:</label> <input type="number" value="2" />
+    <br />
+    <label>Osc2 ratio:</label> <input type="number" value="3" />
+    <br />
+    <label>Osc3 ratio:</label> <input type="number" value="4.16" />
+    <br />
+    <label>Osc4 ratio:</label> <input type="number" value="5.43" />
+    <br />
+    <label>Osc5 ratio:</label> <input type="number" value="6.79" />
+    <br />
+    <label>Osc6 ratio:</label> <input type="number" value="8.21" />
+  </div>
+  <p><button id="six-square-1">Hear it!</button></p>
+  <script>
+    document.getElementById('six-square-1').addEventListener('click', function() {
+      var $inputs = $("#six-square-calculator input[type=number]");
+      var ratios = $inputs.map(function(i, el) {
+        return parseFloat(el.value);
+      }).toArray();
+      var fundamental = ratios.shift();
+      var gain = context.createGain();
+      var when = context.currentTime;
+      var oscs = ratios.map(function(ratio) {
+        var osc = context.createOscillator();
+        osc.type = "square";
+        osc.frequency.value = fundamental * ratio;
+        osc.connect(gain);
+        osc.start(when);
+        osc.stop(when + 0.2);
+        return osc;
+      });
+      gain.connect(context.destination);
+      gain.gain.value = 0.1;
+      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);
+    });
+  </script>
+  <pre class="example"><code class="javascript">var $inputs = $("#six-square-calculator input[type=number]");
+var ratios = $inputs.map(function(i, el) {
+  return parseFloat(el.value);
+}).toArray();
+var fundamental = ratios.shift();
+var gain = context.createGain();
+var when = context.currentTime;
+var oscs = ratios.map(function(ratio) {
+  var osc = context.createOscillator();
+  osc.type = "square";
+  osc.frequency.value = fundamental * ratio;
+  osc.connect(gain);
+  osc.start(when);
+  osc.stop(when + 0.2);
+  return osc;
+});
+gain.connect(context.destination);
+gain.gain.value = 0.1;
+gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);</code></pre>
+  <label class="code-explainer">The event listener for that button</label>
+
+  <p>Ok, six square waves sounds pretty complex, and it's starting to sound precussive, but it's still nothing like a hi-hat. Let's take the next step and run it through a bandpass filter.</p>
+  <h2>Filter Time</h2>
+  <p><i>Examples from here out will use the values in the calculator above, so if you've gotten them out of whack give the page a refresh if you want to be sure you're hearing what I'm hearing.</i></p>
+  <p>Below is a similar tool for setting up the bandpass filter. Click the button to hear the oscillators defined above played through the filter:
+  <div id="bandpass-calculator">
+    <label>Bandpass:</label> <input type="number" value="10000"/>hz
+    <br />
+  </div>
+  <p><button id="bandpass-1">Hear it filtered</button></p>
+  <script>
+    document.getElementById('bandpass-1').addEventListener('click', function() {
+      var $inputs = $("#six-square-calculator input[type=number]");
+      var ratios = $inputs.map(function(i, el) {
+        return parseFloat(el.value);
+      }).toArray();
+      var fundamental = ratios.shift();
+      var gain = context.createGain();
+      var bandpass = context.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
+      console.log(bandpass.frequency.value);
+      var when = context.currentTime;
+      var oscs = ratios.map(function(ratio) {
+        var osc = context.createOscillator();
+        osc.type = "square";
+        osc.frequency.value = fundamental * ratio;
+        osc.connect(bandpass);
+        osc.start(when);
+        osc.stop(when + 0.2);
+        return osc;
+      });
+      bandpass.connect(gain);
+      gain.connect(context.destination);
+      gain.gain.value = 0.6;
+      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);
+    });
+  </script>
+  <p>Crazily enough the sound is starting to get there. It's still plenty clear that there are synths underneath the sound, but I can hear this as a percussive hit rather than a musical tone. Now let's refine the envelope a little bit:</p>
+  <p><button id="refined-envelope">Envelope tweaked</button></p>
+  <script>
+    document.getElementById('refined-envelope').addEventListener('click', function() {
+      var $inputs = $("#six-square-calculator input[type=number]");
+      var ratios = $inputs.map(function(i, el) {
+        return parseFloat(el.value);
+      }).toArray();
+      var fundamental = ratios.shift();
+      var gain = context.createGain();
+      var bandpass = context.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
+      var when = context.currentTime;
+      var oscs = ratios.map(function(ratio) {
+        var osc = context.createOscillator();
+        osc.type = "square";
+        osc.frequency.value = fundamental * ratio;
+        osc.connect(bandpass);
+        osc.start(when);
+        osc.stop(when + 0.2);
+        return osc;
+      });
+      bandpass.connect(gain);
+      gain.connect(context.destination);
+      gain.gain.setValueAtTime(0.00001, when);
+      gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
+      gain.gain.exponentialRampToValueAtTime(1/3, when + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);
+    });
+  </script>
+  <pre class="example"><code class="javascript">gain.gain.setValueAtTime(0.00001, when);
+gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
+gain.gain.exponentialRampToValueAtTime(1/3, when + 0.03);
+gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
+  <label class="code-explainer">Here's the timing for the volume envelope. <code>gain</code> is a GainNode, and <code>gain.gain</code> is an AudioParam. Confusing, I know. Walking through it, we have a quick attack for the first 20ms, then fade down to a third of the volume within the next 10ms, and fade all the way out over the following 270ms.</label>
+  <p>Ok. Even closer. Now let's plug in the last piece of the diagram, the highpass filter.</p>
+  <h2>Highpass</h2>
+  <div id="highpass-calculator">
+    <label>Highpass:</label> <input type="number" value="5000"/>hz
+    <br />
+  </div>
+  <p><button id="highpass-1">With the highpass</button></p>
+  <script>
+    document.getElementById('highpass-1').addEventListener('click', function() {
+      var $inputs = $("#six-square-calculator input[type=number]");
+      var ratios = $inputs.map(function(i, el) {
+        return parseFloat(el.value);
+      }).toArray();
+      var fundamental = ratios.shift();
+      var gain = context.createGain();
+      var bandpass = context.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
+      var when = context.currentTime;
+      var oscs = ratios.map(function(ratio) {
+        var osc = context.createOscillator();
+        osc.type = "square";
+        osc.frequency.value = fundamental * ratio;
+        osc.connect(bandpass);
+        osc.start(when);
+        osc.stop(when + 0.2);
+        return osc;
+      });
+      var highpass = context.createBiquadFilter();
+      highpass.type = "highpass";
+      highpass.frequency.value = parseFloat($("#highpass-calculator input").val());
+      bandpass.connect(highpass);
+      highpass.connect(gain);
+      gain.connect(context.destination);
+      gain.gain.setValueAtTime(0.00001, when);
+      gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.3, when + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);
+    });
+  </script>
+  <p>Well, that pretty much does it. Adding the highpass pulled the last of the synth-y sound out and what we're left with sounds like a hi-hat! Or, at least what we're used to hearing as a hi-hat.</p>
+
+</article>
+<script src="//use.typekit.net/vej1mbp.js"></script>
+<script>try{Typekit.load({ async: true });}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/googlecode.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script src="script.js"></script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-31945659-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.9.0/fetch.min.js"></script>
+<script src="getBuffer.js"></script>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script>
+<script>
+if (window.addthis) {
+  addthis.layers({
+    'theme': "transparent",
+    'share': {
+      'position': 'right',
+      'numPreferredServices': 3
+    }   
+  });
+}
+</script>
+</body>
+</html>
