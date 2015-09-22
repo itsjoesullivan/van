@@ -21,7 +21,7 @@
     Synthesising a realistic-sounding hi-hat is hard. When you strike a disk of metal the sound that is produced is a complex mixture of unevenly-spaced harmonics which decay at different rates. It’s not an impossible task, and if you’re interested there’s some further reading below, but for this post we’re going to cheat a little by sampling an existing sound.
   </blockquote>
   <p>
-    Taking a close look at <a href="http://www.soundonsound.com/sos/Aug02/articles/synthsecrets0802.asp">Gordon Reid's Sound On Sound article</a> on hi-hat synthesis, at least synthesizing the tr-808's hi-hat actually seems pretty feasible:
+    Taking a close look at <a href="http://www.soundonsound.com/sos/Aug02/articles/synthsecrets0802.asp">Gordon Reid's Sound On Sound article</a> on hi-hat synthesis, at least synthesizing the TR-808's hi-hat actually seems pretty feasible:
   </p>
   <blockquote>
     ...multiple oscillators are fed through a filter that removes the low frequencies, and through a VCA controlled by a simple contour generator.
@@ -245,6 +245,49 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
     });
   </script>
   <p>Well, that pretty much does it. Adding the highpass pulled the last of the synth-y sound out and what we're left with sounds like a hi-hat! Or, at least what we're used to hearing as a hi-hat.</p>
+  <pre class="example"><code class="javascript">// Random setup
+var context = new AudioContext();
+var $inputs = $("#six-square-calculator input[type=number]");
+var ratios = $inputs.map(function(i, el) {
+  return parseFloat(el.value);
+}).toArray();
+var fundamental = ratios.shift();
+
+// Always useful
+var when = context.currentTime;
+var gain = context.createGain();
+
+// Init the bandpass filter, which the oscillators plug into
+var bandpass = context.createBiquadFilter();
+bandpass.type = "bandpass";
+bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
+
+// Create the oscillators
+var oscs = ratios.map(function(ratio) {
+  var osc = context.createOscillator();
+  osc.type = "square";
+  // Frequency is the fundamental times this oscillator's ratio
+  osc.frequency.value = fundamental * ratio;
+  osc.connect(bandpass);
+  osc.start(when);
+  osc.stop(when + 0.02);
+  return osc;
+});
+
+// Init highpass
+var highpass = context.createBiquadFilter();
+highpass.type = "highpass";
+highpass.frequency.value = parseFloat($("#highpass-calculator input").val());
+bandpass.connect(highpass);
+highpass.connect(gain);
+gain.connect(context.destination);
+
+// Define the volume envelope
+gain.gain.setValueAtTime(0.00001, when);
+gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
+gain.gain.exponentialRampToValueAtTime(0.3, when + 0.03);
+gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
+  <label class="code-explainer">Our final hi-hat synthesizer</label>
 
 </article>
 <script src="//use.typekit.net/vej1mbp.js"></script>
