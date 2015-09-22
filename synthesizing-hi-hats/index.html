@@ -189,7 +189,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);</code></pre>
         osc.frequency.value = fundamental * ratio;
         osc.connect(bandpass);
         osc.start(when);
-        osc.stop(when + 0.2);
+        osc.stop(when + 0.3);
         return osc;
       });
       bandpass.connect(gain);
@@ -230,7 +230,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
         osc.frequency.value = fundamental * ratio;
         osc.connect(bandpass);
         osc.start(when);
-        osc.stop(when + 0.2);
+        osc.stop(when + 0.3);
         return osc;
       });
       var highpass = context.createBiquadFilter();
@@ -278,7 +278,7 @@ ratios.forEach(function(ratio) {
   osc.frequency.value = fundamental * ratio;
   osc.connect(bandpass);
   osc.start(when);
-  osc.stop(when + 0.02);
+  osc.stop(when + 0.3);
 });
 
 // Define the volume envelope
