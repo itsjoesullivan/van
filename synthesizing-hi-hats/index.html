@@ -206,7 +206,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
   <p>Ok. Even closer. Now let's plug in the last piece of the diagram, the highpass filter.</p>
   <h2>Highpass</h2>
   <div id="highpass-calculator">
-    <label>Highpass:</label> <input type="number" value="5000"/>hz
+    <label>Highpass:</label> <input type="number" value="7000"/>hz
     <br />
   </div>
   <p><button id="highpass-1">With the highpass</button></p>
@@ -261,7 +261,7 @@ bandpass.frequency.value = 10000;
 // Highpass
 var highpass = context.createBiquadFilter();
 highpass.type = "highpass";
-highpass.frequency.value = 5000;
+highpass.frequency.value = 7000;
 
 // Connect the graph
 bandpass.connect(highpass);
