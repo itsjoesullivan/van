@@ -48,6 +48,10 @@ p, li, label {
   line-height: 1.5em;
 }
 
+blockquote {
+  font-family: "minion-pro";
+}
+
 p {
   text-indent: 3em;
 }
