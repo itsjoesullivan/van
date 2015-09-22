@@ -41,7 +41,7 @@
     Let's try to mimic a closed hi-hat's decay: <button id="square-2">Square wave, quick decay</button>
   </p>
   <script>
-    context = new AudioContext();
+    context = new (window.AudioContext || window.webkitAudioContext)();
     document.getElementById("square-1").addEventListener("click", function() {
       var osc = context.createOscillator();
       osc.type = "square";
@@ -151,7 +151,6 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);</code></pre>
       var bandpass = context.createBiquadFilter();
       bandpass.type = "bandpass";
       bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
-      console.log(bandpass.frequency.value);
       var when = context.currentTime + 0.05;
       var oscs = ratios.map(function(ratio) {
         var osc = context.createOscillator();
@@ -295,7 +294,6 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/googlecode.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
-<script src="script.js"></script>
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -306,7 +304,6 @@ ga('send', 'pageview');
 </script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.9.0/fetch.min.js"></script>
-<script src="getBuffer.js"></script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script>
 <script>
 if (window.addthis) {
