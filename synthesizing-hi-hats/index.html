@@ -203,7 +203,7 @@ gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
 gain.gain.exponentialRampToValueAtTime(1/3, when + 0.03);
 gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
   <label class="code-explainer">Here's the timing for the volume envelope. <code>gain</code> is a GainNode, and <code>gain.gain</code> is an AudioParam. Confusing, I know. Walking through it, we have a quick attack for the first 20ms, then fade down to a third of the volume within the next 10ms, and fade all the way out over the following 270ms.</label>
-  <p>Ok. Even closer. Now let's plug in the last piece of the diagram, the highpass filter.</p>
+  <p>Ok. Even closer. Adding the attack and the very quick decay created the snap we're used to hearing in hi-hats. Now let's plug in the last piece of the diagram, the highpass filter.</p>
   <h2>Highpass</h2>
   <div id="highpass-calculator">
     <label>Highpass:</label> <input type="number" value="7000"/>hz
