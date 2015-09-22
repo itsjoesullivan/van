@@ -28,7 +28,7 @@
   </blockquote>
   <p>Sounds simple enough. Let's give it a shot!</p>
   <h2>The Spec</h2>
-  <p>Reid provides a <a href="http://media.soundonsound.com/sos/aug02/images/figb3tr808hh.l.gif">helpful block diagram</a> of the 808 hi-hat sound, which breaks down to this: six square wave oscillators feed into a bandpass filter, which feeds into a highpass filter, which goes through an envelope amplifier. Somehow, the oscillators and filters simulate the sound of the metal, while the envelope provides the hit, attack, and decay, of the sound.
+  <p>Reid provides a <a href="http://media.soundonsound.com/sos/aug02/images/figb3tr808hh.l.gif">helpful block diagram</a> of the 808 hi-hat sound, which breaks down to this: six square wave oscillators feed into a bandpass filter, which feeds into a highpass filter, which goes through a volume envelope. Somehow, the oscillators and filters simulate the sound of the metal, while the envelope provides the hit, attack, and decay, of the sound.
   </p>
   <h2>Square</h2>
   <p>
@@ -243,7 +243,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
       gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);
     });
   </script>
-  <p>Well, that pretty much does it. Adding the highpass pulled the last of the note-y sound out and what we're left with sounds a lot like a hi-hat! Or, at least what we're used to hearing as a hi-hat.</p>
+  <p>Well, that pretty much does it. Adding the highpass pulled the last of the note-y sound out and what we're left with sounds a lot like a hi-hat! Or, at least what we're used to hearing as a hi-hat. All in about 20 lines of code!</p>
   <pre class="example"><code class="javascript">var context = new AudioContext();
 var fundamental = 40;
 var ratios = [2, 3, 4.16, 5.43, 6.79, 8.21];
@@ -285,6 +285,10 @@ gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
 gain.gain.exponentialRampToValueAtTime(0.3, when + 0.03);
 gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
   <label class="code-explainer">Our final hi-hat synthesizer</label>
+  <h2>Conclusion</h2>
+  <p>
+    Thanks to Chris Lowis for getting the ball rolling w/ the kick + snare synthesis, and of course Gordon Reid's Synth Secrets "63-part series". Reid's articles are extremely good, and it's kind of a shame that they aren't more interactive consdidering that we now have web audio. Maybe there's something to be done about that?
+  </p>
 
 </article>
 <script src="//use.typekit.net/vej1mbp.js"></script>
