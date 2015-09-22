@@ -243,43 +243,41 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
       gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);
     });
   </script>
-  <p>Well, that pretty much does it. Adding the highpass pulled the last of the synth-y sound out and what we're left with sounds like a hi-hat! Or, at least what we're used to hearing as a hi-hat.</p>
-  <pre class="example"><code class="javascript">// Random setup
-var context = new AudioContext();
-var $inputs = $("#six-square-calculator input[type=number]");
-var ratios = $inputs.map(function(i, el) {
-  return parseFloat(el.value);
-}).toArray();
-var fundamental = ratios.shift();
+  <p>Well, that pretty much does it. Adding the highpass pulled the last of the note-y sound out and what we're left with sounds a lot like a hi-hat! Or, at least what we're used to hearing as a hi-hat.</p>
+  <pre class="example"><code class="javascript">var context = new AudioContext();
+var fundamental = 40;
+var ratios = [2, 3, 4.16, 5.43, 6.79, 8.21];
 
 // Always useful
 var when = context.currentTime;
+
 var gain = context.createGain();
 
-// Init the bandpass filter, which the oscillators plug into
+// Bandpass
 var bandpass = context.createBiquadFilter();
 bandpass.type = "bandpass";
-bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
+bandpass.frequency.value = 10000;
+
+// Highpass
+var highpass = context.createBiquadFilter();
+highpass.type = "highpass";
+highpass.frequency.value = 5000;
+
+// Connect the graph
+bandpass.connect(highpass);
+highpass.connect(gain);
+gain.connect(context.destination);
 
 // Create the oscillators
-var oscs = ratios.map(function(ratio) {
+ratios.forEach(function(ratio) {
   var osc = context.createOscillator();
   osc.type = "square";
-  // Frequency is the fundamental times this oscillator's ratio
+  // Frequency is the fundamental * this oscillator's ratio
   osc.frequency.value = fundamental * ratio;
   osc.connect(bandpass);
   osc.start(when);
   osc.stop(when + 0.02);
-  return osc;
 });
-
-// Init highpass
-var highpass = context.createBiquadFilter();
-highpass.type = "highpass";
-highpass.frequency.value = parseFloat($("#highpass-calculator input").val());
-bandpass.connect(highpass);
-highpass.connect(gain);
-gain.connect(context.destination);
 
 // Define the volume envelope
 gain.gain.setValueAtTime(0.00001, when);
