@@ -182,7 +182,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);</code></pre>
       var bandpass = context.createBiquadFilter();
       bandpass.type = "bandpass";
       bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
-      var when = context.currentTime + 0.05;
+      var when = context.currentTime + 0.1;
       var oscs = ratios.map(function(ratio) {
         var osc = context.createOscillator();
         osc.type = "square";
@@ -194,6 +194,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);</code></pre>
       });
       bandpass.connect(gain);
       gain.connect(context.destination);
+      gain.gain.value = 0;
       gain.gain.setValueAtTime(0.00001, when);
       gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
       gain.gain.exponentialRampToValueAtTime(1/3, when + 0.03);
@@ -223,7 +224,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
       var bandpass = context.createBiquadFilter();
       bandpass.type = "bandpass";
       bandpass.frequency.value = parseFloat($("#bandpass-calculator input").val());
-      var when = context.currentTime + 0.05;
+      var when = context.currentTime + 0.1;
       var oscs = ratios.map(function(ratio) {
         var osc = context.createOscillator();
         osc.type = "square";
@@ -239,6 +240,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);</code></pre>
       bandpass.connect(highpass);
       highpass.connect(gain);
       gain.connect(context.destination);
+      gain.gain.value = 0;
       gain.gain.setValueAtTime(0.00001, when);
       gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.3, when + 0.03);
