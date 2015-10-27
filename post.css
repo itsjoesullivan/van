@@ -18,6 +18,11 @@
   margin: 1em;
 }
 
+header {
+  display: flex;
+  align-items: center;
+}
+
 header a {
   font-family: monospace;
 }
