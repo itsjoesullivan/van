@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<title>Best of CBB, 2015</title>
+<meta name="viewport" content="width=device-width">
+<link rel='stylesheet' href='tufte.css' />
+<style>
+.chart {
+  max-width: 800px;
+}
+.item {
+  width: 100%;
+  overflow: auto;
+}
+.label, .bar {
+  float: left;
+  width: 45%;
+  margin: 1% 2%;
+}
+.label {
+  text-align: right;
+}
+.guests {
+  font-size: 80%;
+}
+</style>
+
+</head>
+<body>
+<h1>Best of CBB, 2015</h1>
+<p class="updated"></p>
+<div class="chart"></div>
+<script src="d3.js" charset="utf-8"></script>
+<script src="jquery.js"></script>
+<script>
+$.getJSON("./data.json").then(render);
+
+function render(allData) {
+  $(".updated").html("Last updated " + (new Date(allData.date)).toDateString());
+  data = allData.data
+  var maxVotes = Math.max.apply(Math, data.map(function(datum) { return datum.votes }));
+  var maxWidth = 200;
+  var filteredData = data.filter(function(datum) {
+    return datum.votes > maxVotes / 10;
+  });
+  div = d3.select(".chart")
+    .selectAll("div")
+      .data(filteredData)
+    .enter().append("div")
+    .attr('class','item')
+  labels = div.append('div')
+    .html(function(d) { return d.name + ' (#' + d.number + ')' })
+    .attr('class', 'label')
+  labels.append('div')
+    .attr('class', 'guests')
+    .html(function(d) { return '(' + d.guests.join(', ') + ')'; })
+
+  bars = div.append('div')
+    .attr('class', 'bar')
+  bars.append("div")
+      .style('width', function(d) { return maxWidth * d.votes / maxVotes + 'px' })
+      .text('.')
+      .style("background-color", 'black')
+      .style('display', 'inline-block')
+  bars.append("text")
+      .text(function(d) { return ' ' + d.votes; })
+}
+</script>
+</body>
+</html>
