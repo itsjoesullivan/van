@@ -32,12 +32,14 @@
 <div class="chart"></div>
 <script src="d3.js" charset="utf-8"></script>
 <script src="jquery.js"></script>
+<script src="underscore.js"></script>
 <script>
 $.getJSON("./data.json").then(render);
 
 function render(allData) {
   $(".updated").html("Last updated " + (new Date(allData.date)).toDateString());
   data = allData.data
+  data = _(data).sortBy(function(d) { return -d.votes; });
   var maxVotes = Math.max.apply(Math, data.map(function(datum) { return datum.votes }));
   var maxWidth = 200;
   var filteredData = data.filter(function(datum) {
