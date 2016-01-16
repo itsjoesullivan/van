@@ -90,7 +90,7 @@ The code that bootstraps the library currently stands at 65 lines of code, comme
 }</pre>
 Each function returns a promise via <code>request-promise</code>.
 </p>
-<h2>Conclusion</h2>
+<h2>More...</h2>
 <p>
 That's more or less the process. To consume the API, there is <a href="https://github.com/itsjoesullivan/digital-ocean-wrench">digital-ocean-wrench</a> ( <code>npm install -g dow</code> ). It uses a <a href="https://github.com/itsjoesullivan/digital-ocean-wrench/blob/master/method-map.json">map</a> to convert:
 <br />
@@ -101,7 +101,6 @@ That's more or less the process. To consume the API, there is <a href="https://g
 <p>
 But even that doesn't require too much work beyond defining the actual mapping.
 </p>
-<h2>More...</h2>
 <p>During the process, I noticed <a href="https://developers.digitalocean.com/documentation/v2/#delete-a-floating-ips">one pluralization error</a>, <a href="https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet">one instance</a> where a <code>PATH</code> is described unusually, and <a href="https://developers.digitalocean.com/documentation/v2/#get-user-information">one action</a> that is simply not described at all. Despite that, the documentation is of unusually high quality, which leads to the observation that documentation is simply not held to the same standard as code. Code generated from documentation isn't guaranteed to be up to snuff, so use it with caution. Releases of <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation">parsed-digital-ocean-api-documentation</a> will be carefully reviewed.
 </p>
 <p>
