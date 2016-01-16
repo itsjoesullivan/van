@@ -38,7 +38,7 @@ The approach that I landed on has two pieces: convert the HTML of the documentat
 <p>
 Each API action consists of, at most, a path, a method, and a list of properties to be sent in the body. Below is one of the more complex operations (transfer an image from one data center to another).
 <pre>{
-  "images": {
+  "images": [{
     "name": "transferImage",
     "path": "/v2/images/$IMAGE_ID/actions",
     "method": "POST",
@@ -58,7 +58,7 @@ Each API action consists of, at most, a path, a method, and a list of properties
     "staticProperties": {
       "type": "transfer"
     }
-  }
+  }]
 }</pre>
 <ul>
   <li>Individual actions are under categories ("transferImage" is under the "images" category).</li>
