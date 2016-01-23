@@ -100,21 +100,22 @@ The code that bootstraps the library currently stands at 65 lines of code, comme
 }</pre>
 Each function returns a promise via <code>request-promise</code>.
 </p>
-<h2>More...</h2>
+<h2>From library to CLI</h2>
 <p>
-That's more or less the process. To use the API from the command line, there is <a href="https://github.com/itsjoesullivan/digital-ocean-wrench">digital-ocean-wrench</a> ( <code>npm install -g dow</code> ). It uses a <a href="https://github.com/itsjoesullivan/digital-ocean-wrench/blob/master/method-map.json">map</a> to convert:
+That's more or less the process. To use the API from the command line, there is <a href="https://github.com/itsjoesullivan/digital-ocean-wrench">digital-ocean-wrench</a> ( <code>npm install -g dow</code> ). It uses a <a href="https://github.com/itsjoesullivan/digital-ocean-wrench/blob/master/lib/method-map.json">map</a> to convert:
 <br />
 <pre>    <code>dow floating-ip create --region=nyc2</code></pre>
 <pre>        to</pre>
 <pre>    <code>api.floatingIPActions.createNewFloatingIPReservedToRegion({ region: "nyc2" })</code></pre>
 </p>
-<p>
-But even that doesn't require too much work beyond defining the actual mapping.
-</p>
-<p>During the process, I noticed <a href="https://developers.digitalocean.com/documentation/v2/#delete-a-floating-ips">one pluralization error</a>, <a href="https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet">one instance</a> where a <code>PATH</code> is described unusually, and <a href="https://developers.digitalocean.com/documentation/v2/#get-user-information">one action</a> that is simply not described at all. Despite that, the documentation is of unusually high quality, which raises the topic that documentation is simply not held to the same standard as code. Code generated from documentation isn't guaranteed to be up to snuff, so use it with caution. Releases of <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation">parsed-digital-ocean-api-documentation</a> will be carefully reviewed.
+<h2>More...</h2>
+<p>Working on this, I noticed several issues in the documentation: <a href="https://developers.digitalocean.com/documentation/v2/#delete-a-floating-ips">one pluralization error</a>, <a href="https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet">one instance</a> where a <code>PATH</code> is described unusually, and <a href="https://developers.digitalocean.com/documentation/v2/#get-user-information">one action</a> that is simply not described at all. This in spite of the fact that this is great documentation. This brings up the point that API documentation doesn't usually meet the same quality standards as the code it describes, so it should be used with caution. Releases of <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation">parsed-digital-ocean-api-documentation</a> will need to be carefully reviewed.
 </p>
 <p>
 This experience raises the question: should documentation be good enough to generate a library from? It seems like a pretty good characteristic of documentation. API libraries often skip the methods that aren't useful to the author/s. An automated process, on the other hand, makes it just as easy to generate a complete library as an incomplete one.
+</p>
+<p>
+How well can this method of library generation travel? A useful next step would be to survey other popular APIs and determine whether many have simple enough APIs and good enough documentation to give it a try. Perhaps some of the code present here could be re-used, though I'd like to emphasize that this method is still a faster in terms of dev-time than implementing methods manually.
 </p>
 <p>To reiterate:
 <ul>
