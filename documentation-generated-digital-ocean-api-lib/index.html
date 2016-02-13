@@ -4,7 +4,7 @@
     <link href='https://fonts.googleapis.com/css?family=Vollkorn:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
     <style>
       html, body {
-        font-family: "baskerville-urw", serif;
+        font-family: serif;
       }
       h1,
       h2,
@@ -15,6 +15,7 @@
       code,
       pre {
         font-family: "inconsolata", monospace;
+        font-size: 0.9em;
       }
       .container {
         max-width: 600px;
@@ -26,9 +27,14 @@
         text-align: center;
       }
       p {
-        text-indent: 4em;
-        font-size: 1.1em;
+        text-indent: 3em;
         line-height: 1.8em;
+      }
+      p, li {
+        font-size: 1em;
+      }
+      li {
+        line-height: 1.5em;
       }
       .byline { text-align: right; }
     </style>
@@ -40,7 +46,7 @@
 <h1>Digital Ocean Documentation-Generated API Library</h1>
 <p class="byline"><a href="/van">Joe Sullivan</a></p>
 <p>
-Digging into the <a href="https://developers.digitalocean.com/documentation/v2/">Digital Ocean API documentation</a>, I thought it was darn good documentation. In fact, it seemed so darn good that I wondered if it would be possible to generate a library for the API by scraping the documentation. It turns out that <a href="https://github.com/itsjoesullivan/digital-ocean-api-v2">it is</a>, and what follows is part description of the process of making it, and part other thoughts that came up in the process.
+The <a href="https://developers.digitalocean.com/documentation/v2/">Digital Ocean API documentation</a> is good. In fact, it's so good that I wondered if I could build a library to the API by scraping it. This is that story, resulting in <a href="https://github.com/itsjoesullivan/digital-ocean-api-v2">a complete node.js library</a> and <a href="https://github.com/itsjoesullivan/digital-ocean-wrench">a CLI</a> to it.
 </p>
 <h2>Overview</h2>
 <p>
@@ -48,35 +54,39 @@ The approach that I landed on has two pieces: convert the HTML of the documentat
 </p>
 <h2>HTML to JSON</h2>
 <p>
-Each API action consists of, at most, a path, a method, and a list of properties to be sent in the body. Below is one of the more complex operations (transfer an image from one data center to another).
+Each API action consists of, at most, a path, a method, and a list of properties to be sent in the body. Below is a JSON representation of one of the more complex operations, transfering an image from one data center to another: 
+</p>
 <pre>{
-  "images": [{
-    "name": "transferImage",
-    "path": "/v2/images/$IMAGE_ID/actions",
-    "method": "POST",
-    "requiredResourceIdCount": 1,
-    "requiredProperties": [
-      {
-        "name": "type",
-        "type": "string",
-        "required": true
-      },
-      {
-        "name": "region",
-        "type": "string",
-        "required": true
-      }
-    ],
-    "staticProperties": {
-      "type": "transfer"
+  "name": "transferImage",
+  "path": "/v2/images/$IMAGE_ID/actions",
+  "method": "POST",
+  "requiredResourceIdCount": 1,
+  "requiredProperties": [
+    {
+      "name": "type",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "region",
+      "type": "string",
+      "required": true
     }
-  }]
+  ],
+  "staticProperties": {
+    "type": "transfer"
+  }
 }</pre>
+<p>
+(<a href="https://developers.digitalocean.com/documentation/v2/#transfer-an-image">Here's</a> the Digital Ocean documentation for that action.)
+</p>
+<p>
+A few notes:
+</p>
 <ul>
-  <li>Individual actions are under categories ("transferImage" is under the "images" category).</li>
   <li>The path can contain one or more ID fields. See <code>$IMAGE_ID</code> above.</li>
-  <li>The body may need certain properties' values to be set (e.g. <code>{type: "transfer"}</code> is what conveys that this is a transfer operation). The <code>staticProperties</code> property holds these values.</li>
-  <li>Finally, certain parameters may be required to perform the request.</li>
+  <li>The body may need certain properties' values to be set (e.g. <code>{type: "transfer"}</code> is what conveys that this is a transfer operation). In the scheme representation, <code>staticProperties</code> property holds these values.</li>
+  <li>Certain parameters may be required to perform the request.</li>
 </ul>
 </p>
 <p>
@@ -84,7 +94,7 @@ I'm not sure it's necessary to go into the actual process of parsing the HTML. I
 </p>
 <h2>JSON to .js</h2>
 <p>
-The code that bootstraps the library currently stands at 65 lines of code, comments included, so it suffices to say that once you have the JSON, most of the work is done. The process that the package follows, though, is to feed the JSON into a <a href="https://github.com/itsjoesullivan/digital-ocean-api-v2/blob/master/lib/factory.js">factory</a> (which is surprisingly simple) that converts objects into functions, yielding an object like:
+Once we have the JSON, a <a href="https://github.com/itsjoesullivan/digital-ocean-api-v2/blob/master/lib/factory.js">factory</a> converts a model to a function. Running each of the models through this process yields the actual library, which looks like:
 <pre>api = {
   droplets: {
     createNewDroplet: [Function],
@@ -108,8 +118,10 @@ That's more or less the process. To use the API from the command line, there is 
 <pre>        to</pre>
 <pre>    <code>api.floatingIPActions.createNewFloatingIPReservedToRegion({ region: "nyc2" })</code></pre>
 </p>
+<p>It uses <a href="https://github.com/bcoe/yargs">yargs</a>, which I found to be great.
+</p>
 <h2>More...</h2>
-<p>Working on this, I noticed several issues in the documentation: <a href="https://developers.digitalocean.com/documentation/v2/#delete-a-floating-ips">one pluralization error</a>, <a href="https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet">one instance</a> where a <code>PATH</code> is described unusually, and <a href="https://developers.digitalocean.com/documentation/v2/#get-user-information">one action</a> that is simply not described at all. This in spite of the fact that this is great documentation. This brings up the point that API documentation doesn't usually meet the same quality standards as the code it describes, so it should be used with caution. Releases of <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation">parsed-digital-ocean-api-documentation</a> will need to be carefully reviewed.
+<p>Working closely with this documentation, I noticed <a href="https://developers.digitalocean.com/documentation/v2/#delete-a-floating-ips">one pluralization error</a>, <a href="https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet">one instance</a> where a <code>PATH</code> is described unusually, <a href="https://developers.digitalocean.com/documentation/v2/#get-user-information">one action</a> that is simply not described at all, and a <a href="https://developers.digitalocean.com/documentation/v2/#assign-a-floating-ip-to-a-droplet">few</a> <a href="https://developers.digitalocean.com/documentation/v2/#unassign-a-floating-ip">places</a> where non-crucial data wasn't described in the standard way. Yet this is <b>good</b> documentation. This brings up the reality that API documentation doesn't usually meet the same quality standards as the code it describes, so it should be used with caution.
 </p>
 <p>
 This experience raises the question: should documentation be good enough to generate a library from? It seems like a pretty good characteristic of documentation. API libraries often skip the methods that aren't useful to the author/s. An automated process, on the other hand, makes it just as easy to generate a complete library as an incomplete one.
