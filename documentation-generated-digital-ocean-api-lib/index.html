@@ -1,48 +1,12 @@
 <!doctype html>
 <html>
   <head>
-    <link href='https://fonts.googleapis.com/css?family=Vollkorn:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
-    <style>
-      html, body {
-        font-family: serif;
-      }
-      h1,
-      h2,
-      h3,
-      h4 {
-        font-family: "le-monde-journal-std-2",sans-serif;
-      }
-      code,
-      pre {
-        font-family: "inconsolata", monospace;
-        font-size: 0.9em;
-      }
-      .container {
-        max-width: 600px;
-        margin: auto;
-        margin-top: 2em;
-        margin-bottom: 2em;
-      }
-      h1 {
-        text-align: center;
-      }
-      p {
-        text-indent: 3em;
-        line-height: 1.8em;
-      }
-      p, li {
-        font-size: 1em;
-      }
-      li {
-        line-height: 1.5em;
-      }
-      .byline { text-align: right; }
-    </style>
+  <link rel="stylesheet" href="../tale-of-no-clocks/style.css" />
     <meta name="viewport" content="width=device-width">
   <title>Digital Ocean Documentation-Generated API Library</title>
   </head>
   <body>
-<div class="container">
+    <article>
 <h1>Digital Ocean Documentation-Generated API Library</h1>
 <p class="byline"><a href="/van">Joe Sullivan</a></p>
 <p>
@@ -56,7 +20,7 @@ The approach that I landed on has two pieces: convert the HTML of the documentat
 <p>
 Each API action consists of, at most, a path, a method, and a list of properties to be sent in the body. Below is a JSON representation of one of the more complex operations, transfering an image from one data center to another: 
 </p>
-<pre>{
+<pre><code class="json">{
   "name": "transferImage",
   "path": "/v2/images/$IMAGE_ID/actions",
   "method": "POST",
@@ -76,7 +40,7 @@ Each API action consists of, at most, a path, a method, and a list of properties
   "staticProperties": {
     "type": "transfer"
   }
-}</pre>
+}</code></pre>
 <p>
 (<a href="https://developers.digitalocean.com/documentation/v2/#transfer-an-image">Here's</a> the Digital Ocean documentation for that action.)
 </p>
@@ -144,7 +108,7 @@ How well can this method of library generation travel? A useful next step would 
   </li>
 </ul>
 </p>
-</div>
+</article>
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -154,6 +118,9 @@ ga('create', 'UA-31945659-1', 'auto');
 ga('send', 'pageview');
 </script>
 <script src="https://use.typekit.net/vtn6mfd.js"></script>
-<script>try{Typekit.load({ async: true });}catch(e){}</script>
+<script src="//use.typekit.net/vej1mbp.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/googlecode.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 </body>
 </html>
