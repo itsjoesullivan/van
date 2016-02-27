@@ -6,6 +6,9 @@
   <title>Digital Ocean Documentation-Generated API Library</title>
   </head>
   <body>
+<header>
+<a href="http://joesul.li/van">joesul.li/van</a>
+</header>
     <article>
 <h1>Digital Ocean Documentation-Generated API Library</h1>
 <p class="byline"><a href="/van">Joe Sullivan</a></p>
@@ -14,7 +17,7 @@ The <a href="https://developers.digitalocean.com/documentation/v2/">Digital Ocea
 </p>
 <h2>Overview</h2>
 <p>
-The approach that I landed on has two pieces: convert the HTML of the documentation into JSON describing the API, then write an NPM package to read that JSON and expose each action to the consumer.
+The approach that I landed on has two pieces: convert the HTML of the documentation into JSON describing the API, then write an NPM package to read that JSON upon initialization and expose each action to the consumer.
 </p>
 <h2>HTML to JSON</h2>
 <p>
@@ -45,21 +48,21 @@ Each API action consists of, at most, a path, a method, and a list of properties
 (<a href="https://developers.digitalocean.com/documentation/v2/#transfer-an-image">Here's</a> the Digital Ocean documentation for that action.)
 </p>
 <p>
-A few notes:
+A few notes on the model:
 </p>
 <ul>
   <li>The path can contain one or more ID fields. See <code>$IMAGE_ID</code> above.</li>
-  <li>The body may need certain properties' values to be set (e.g. <code>{type: "transfer"}</code> is what conveys that this is a transfer operation). In the scheme representation, <code>staticProperties</code> property holds these values.</li>
-  <li>Certain parameters may be required to perform the request.</li>
+  <li>The body may need certain properties' values to be set (e.g. <code class='json'>{type: "transfer"}</code> is what conveys that this is a transfer operation). In the model, the <code>staticProperties</code> property holds these values.</li>
+  <li>Certain parameters (under <code>requiredProperties</code>) may be required to perform the request. Above, <code>type</code> is already supplied, but <code>region</code> is required as well.</li>
 </ul>
 </p>
 <p>
-I'm not sure it's necessary to go into the actual process of parsing the HTML. I used <a href="https://github.com/cheeriojs/cheerio">cheerio</a>, and all the data required above is present in the documentation. The actual parser script is <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation/blob/parser/parser.js">here</a>.
+I won't go into the actual process of parsing the HTML. It's a little messy, but straightforward. I used <a href="https://github.com/cheeriojs/cheerio">cheerio</a>, and all the data required above is present in the documentation. The actual parser script is <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation/blob/parser/parser.js">here</a>.
 </p>
 <h2>JSON to .js</h2>
 <p>
 Once we have the JSON, a <a href="https://github.com/itsjoesullivan/digital-ocean-api-v2/blob/master/lib/factory.js">factory</a> converts a model to a function. Running each of the models through this process yields the actual library, which looks like:
-<pre>api = {
+<pre><code class="js">api = {
   droplets: {
     createNewDroplet: [Function],
     retrieveExistingDropletById: [Function]
@@ -71,7 +74,8 @@ Once we have the JSON, a <a href="https://github.com/itsjoesullivan/digital-ocea
     ...
   },
   ...
-}</pre>
+}</code></pre>
+<p>
 Each function returns a promise via <code>request-promise</code>.
 </p>
 <h2>From library to CLI</h2>
@@ -88,10 +92,10 @@ That's more or less the process. To use the API from the command line, there is 
 <p>Working closely with this documentation, I noticed <a href="https://developers.digitalocean.com/documentation/v2/#delete-a-floating-ips">one pluralization error</a>, <a href="https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet">one instance</a> where a <code>PATH</code> is described unusually, <a href="https://developers.digitalocean.com/documentation/v2/#get-user-information">one action</a> that is simply not described at all, and a <a href="https://developers.digitalocean.com/documentation/v2/#assign-a-floating-ip-to-a-droplet">few</a> <a href="https://developers.digitalocean.com/documentation/v2/#unassign-a-floating-ip">places</a> where non-crucial data wasn't described in the standard way. Yet this is <b>good</b> documentation. This brings up the reality that API documentation doesn't usually meet the same quality standards as the code it describes, so it should be used with caution.
 </p>
 <p>
-This experience raises the question: should documentation be good enough to generate a library from? It seems like a pretty good characteristic of documentation. API libraries often skip the methods that aren't useful to the author/s. An automated process, on the other hand, makes it just as easy to generate a complete library as an incomplete one.
+Being capable of being used to generate a library seems like a pretty good characteristic of documentation. The only requirement to do that is for all the documentation to be presented in a straightforward, structured way. The benefit is that it makes generating complete libraries in different languages easy.
 </p>
 <p>
-How well can this method of library generation travel? A useful next step would be to survey other popular APIs and determine whether many have simple enough APIs and good enough documentation to give it a try. Perhaps some of the code present here could be re-used, though I'd like to emphasize that this method is still faster in terms of dev-time than implementing methods manually.
+How well does this method of library generation travel? A useful next step would be to survey other popular APIs and determine whether many have simple enough APIs and good enough documentation to give it a try. Perhaps some of the code present here could be re-used, though I'd like to emphasize that this method is still faster in terms of development time than implementing methods manually.
 </p>
 <p>To reiterate:
 <ul>
