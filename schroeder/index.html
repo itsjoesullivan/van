@@ -1,51 +1,175 @@
-<!doctype html>
-<html>
 <head>
-<title>schroeder - joesul.li/van</title>
-<link rel='stylesheet' href='style.css' />
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-31945659-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>
-<!-- AddThis Smart Layers BEGIN -->
-<!-- Go to http://www.addthis.com/get/smart-layers to customize -->
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script>
-<script type="text/javascript">
-  addthis.layers({
-    'theme' : 'transparent',
-    'share' : {
-      'position' : 'right',
-      'numPreferredServices' : 3
-    }   
-  });
-</script>
-<!-- AddThis Smart Layers END -->
+    <title>Schroeder: an electric piano built on web technologies.</title>
+    <meta name="viewport" content="width=device-width">
+    <!--script src="https://code.jquery.com/jquery-1.12.0.min.js"></script-->
+    <script src="lazysizes.min.js"></script>
+    <style>
+        img {
+            width: 100%;
+        }
+        html {
+            background-color: white;
+            font-family: verdana;
+            margin: 1em;
+        }
+        body {
+            max-width: 600px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 2em;
+        }
+        p {
+            margin-bottom: 2em;
+        }
+        .lazyload, .lazyloading {
+          -webkit-filter: blur(5px);
+          filter: blur(5px);
+        }
+        .img-container {
+          overflow: hidden;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="banner">
-  <img src='banner2.jpg' />
-  </div>
-  <div class='hero'>schroeder</div>
-  <div class="copy">
-    <p>Schroeder is a hardware music keyboard built on a web stack.</p>
-    <h2>The stack</h2>
-    <p>Under the cover is a Chromebox running an app I developed 'specially for schroeder</p>
-    <p>The other hardware is a midi keyboard ( <a target="_blank" href="http://www.korg.com/us/products/controllers/microkey/">a Korg microKEY 25</a> ), an amp and speaker, and a wooden case.</p>
+    <h1>Schroeder</h1>
+    <h2>DIY Electronic Piano using ChromeOS</h2>
+    <script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>
 
-    <h2>The app</h2>
-    <p>The app is a Chrome packaged app. It uses the USB API to listen to the keyboard (<a target="_blank" href="https://gist.github.com/itsjoesullivan/8064641">here's a gist to the code for that</a>), maps notes/velocity to audio files, and uses the Web Audio API to play them.</p>
-    <p>It's written in coffeescript and does a little requirejs'ing.</p>
+    <div class="img-container"><img src="images/low/insta-1.jpg" data-src="images/1280/insta-1.jpg" class=" lazyload"></div>
+    <label>October 31, 2013: the earliest photo I have of the project.</label>
 
-    <h2>The sound</h2>
-    <p>Much as I'd have liked to record a wurlitzer myself, I ended up sampling the <a target="_blank" href="http://www.native-instruments.com/en/products/komplete/keys/scarbee-a200/artists/">Scarbee A-200</a> virtual instrument instead.</p>
-  </div>
+    <div class="img-container"><img src="images/low/insta-2.jpg" data-src="images/1280/insta-2.jpg" class=" lazyload"></div>
+    <label>Working on the software. The piano uses samples from a wurlitzer instrument.</label>
+
+    <div class="img-container"><img src="images/low/first-photo.jpg" data-src="images/1280/first-photo.jpg" class=" lazyload"></div>
+    <label>March, 2014. I had built the enclosure, installed the speaker and the keyboard. I thought that was the hard part!</label>
+
+    <div class="img-container"><img src="images/low/chrome-box.jpg" data-src="images/1280/chrome-box.jpg" class=" lazyload"></div>
+    <label>The brand new Chromebox arrives. The perfect platform for a hardware web audio project.</label>
+
+    <div class="img-container"><img src="images/low/chromebox-fitting.jpg" data-src="images/1280/chromebox-fitting.jpg" class="lazyload"></div>
+    <label>Chromebox gets its first fitting.</label>
+
+    <div class="img-container"><img src="images/low/chromebox-fitting-2.jpg" data-src="images/1280/chromebox-fitting-2.jpg" class="lazyload"></div>
+    <label>Or should I say not fitting!</label>
+
+    <div class="img-container"><img src="images/low/hdmi.jpg" data-src="images/1280/hdmi.jpg" class="lazyload"></div>
+    <label>Working on the software. At this point I am sure that this television won't fit inside the enclosure.</label>
+
+    <div class="img-container"><img src="images/low/chromebox-2.jpg" data-src="images/1280/chromebox-2.jpg" class="lazyload"></div>
+    <label>Desperate times...</label>
+
+    <div class="img-container"><img src="images/low/big-hole.jpg" data-src="images/1280/big-hole.jpg" class="lazyload"></div>
+    <label>...call for desperate measures.</label>
+
+    <div class="img-container"><img src="images/low/chic.jpg" data-src="images/1280/chic.jpg" class="lazyload"></div>
+    <label>Chic.</label>
+
+    <div class="img-container"><img src="images/low/admiring.jpg" data-src="images/1280/admiring.jpg" class="lazyload"></div>
+    <label>Admiring my handiwork, but still plenty of external dependencies, evidenced by the cables to the right. April, 2014.</label>
+
+    <p>The project slumbered for over a year. In January, 2015, IRCAM held <a href="http://wac.ircam.fr/">the first Web Audio Conference</a>.</p>
+
+    <div class="img-container"><img src="images/low/chromebook.jpg" data-src="images/1280/chromebook.jpg" class="lazyload"></div>
+    <label>In August, 2015 I purchased a touchscreen Chromebook. Maybe this will be the ultimate platform for a hardware web audio project. I dusted off my enclosure and plugged in the Chromebook, loading up <a href="https://twitter.com/luketeaford">Luke Teaford</a>'s <a href="http://luketeaford.com/apps/tanguy/">Tanguy</a>, which Luke had demonstrated at IRCAM. Low latency: check; touchscreen: check. However, it doesn't seem feasible to integrate the Chromebook into the enclosure. I was stubborn about this because I did not want to build a new one.</label>
+
+    <div class="img-container"><img src="images/low/all-together.jpg" data-src="images/1280/all-together.jpg" class="lazyload"></div>
+    <label>January, 2016. I submitted Schroeder to the 2nd Web Audio Conference, to be held at Georgia Tech. When it was accepted I began to get nervous about how to fit the entire thing inside the enclosure. Luckily, last November Google had released a new ChromeOS form factor: Chromebit. This finally felt like the ultimate platform for a hardware web audio project! I picked up a touch-enabled HDMI screen from Adafruit, and an HDMI splitter to provide an analog audio out.</label>
+
+    <div class="img-container"><img src="images/low/screen-one.jpg" data-src="images/1280/screen-one.jpg" class="lazyload"></div>
+    <label>Starting to think about space. The screen can be mounted on the top along with the speaker and amplifier. Note all the excess cabling! You can see the Chromebit just above the keyboard. It's not much larger than a thumbdrive.</label>
+
+    <div class="img-container"><img src="images/low/sans-cable.jpg" data-src="images/1280/sans-cable.jpg" class="lazyload"></div>
+    <label>Without cables, this might work.</label>
+
+    <div class="img-container"><img src="images/low/tolex-1.jpg" data-src="images/1280/tolex-1.jpg" class="lazyload"></div>
+    <label>Preparing to add the tolex cover</label>
+
+    <div class="img-container"><img src="images/low/tolex-2.jpg" data-src="images/1280/tolex-2.jpg" class="lazyload"></div>
+    <label>Rubber cement. Note to self: next time use non-toxic version.</label>
+
+    <div class="img-container"><img src="images/low/tolex-3.jpg" data-src="images/1280/tolex-3.jpg" class="lazyload"></div>
+    <label>No magic involved.</label>
+
+    <div class="img-container"><img src="images/low/tolex-5.jpg" data-src="images/1280/tolex-5.jpg" class="lazyload"></div>
+    <label>Just like wrapping a present.</label>
+
+    <div class="img-container"><img src="images/low/tolex-4.jpg" data-src="images/1280/tolex-4.jpg" class="lazyload"></div>
+    <label>Bigger pieces now. Check out my carpet!</label>
+
+    <div class="img-container"><img src="images/low/tolex-6.jpg" data-src="images/1280/tolex-6.jpg" class="lazyload"></div>
+    <label>Multi-tasking. Note the change jar as a weight. For the record, this isn't how rubber cement works. You're supposed to apply a layer of it, let it dry a little bit, and then stick the surfaces together. The bond should form instantaneously.</label>
+
+    <div class="img-container"><img src="images/low/tolex-7.jpg" data-src="images/1280/tolex-7.jpg" class="lazyload"></div>
+    <label>Don't be too careful.</label>
+
+    <div class="img-container"><img src="images/low/more-software.jpg" data-src="images/1280/more-software.jpg" class="lazyload"></div>
+    <label>Revisiting the software in 2016. The MIDI API had shifted a little.</label>
+
+    <div class="img-container"><img src="images/low/tolex-sides.jpg" data-src="images/1280/tolex-sides.jpg" class="lazyload"></div>
+    <label>The side of the enclosure have their tolex covering.</label>
+
+    <div class="img-container"><img src="images/low/my-workshop.jpg" data-src="images/1280/my-workshop.jpg" class="lazyload"></div>
+    <label>My workshop!</label>
+
+    <div class="img-container"><img src="images/low/my-workshop-2.jpg" data-src="images/1280/my-workshop-2.jpg" class="lazyload"></div>
+    <label>Working in an apartment, sawdust needs to be contained. <a href="https://cdn.meme.am/instances/500x/67745181.jpg" target="_blank">Saw over a box!</a>
+    </label>
+
+    <div class="img-container"><img src="images/low/tolex-almost-done.jpg" data-src="images/1280/tolex-almost-done.jpg" class="lazyload"></div>
+    <label>Tolex application almost complete.</label>
+
+    <div class="img-container"><img src="images/low/enclosure-finished.jpg" data-src="images/1280/enclosure-finished.jpg" class="lazyload"></div>
+    <label>Enclosure is complete, including hinges. I bailed on the rubber cement because I was afraid of the fumes, so you can see Gorilla tape on the top.</label>
+
+    <div class="img-container"><img src="images/low/enclosure-closed.jpg" data-src="images/1280/enclosure-closed.jpg" class="lazyload"></div>
+    <label>Enclosure closed.</label>
+
+    <div class="img-container"><img src="images/low/components-top.jpg" data-src="images/1280/components-top.jpg" class="lazyload"></div>
+    <label>Installing components: top half.</label>
+
+    <div class="img-container"><img src="images/low/components-bottom.jpg" data-src="images/1280/components-bottom.jpg" class="lazyload"></div>
+    <label>Installing components: bottom half.</label>
+
+    <div class="img-container"><img src="images/low/keyboard-1.jpg" data-src="images/1280/keyboard-1.jpg" class="lazyload"></div>
+    <label>Time to cannibalize the keyboard.</label>
+
+    <div class="img-container"><img src="images/low/keyboard-2.jpg" data-src="images/1280/keyboard-2.jpg" class="lazyload"></div>
+    <label>Remove the screws!</label>
+
+    <div class="img-container"><img src="images/low/keyboard-3.jpg" data-src="images/1280/keyboard-3.jpg" class="lazyload"></div>
+    <label>Remove the inside screws!</label>
+
+    <div class="img-container"><img src="images/low/keyboard-4.jpg" data-src="images/1280/keyboard-4.jpg" class="lazyload"></div>
+    <label>Voila! The breakout board (top left) has the USB port.</label>
+
+    <div class="img-container"><img src="images/low/keyboard-5.jpg" data-src="images/1280/keyboard-5.jpg" class="lazyload"></div>
+    <label>A match made in heaven.</label>
+
+    <div class="img-container"><img src="images/low/all-top.jpg" data-src="images/1280/all-top.jpg" class="lazyload"></div>
+    <label>Seeking an efficient way to place the components. The space at the right is taken up by the speaker when closed. Also trying to make sure the Chromebit takes center stage.</label>
+
+    <div class="img-container"><img src="images/low/cable-notch.jpg" data-src="images/1280/cable-notch.jpg" class="lazyload"></div>
+    <label>I created a little notch for the power cables to enter the enclosure.</label>
+
+    <div class="img-container"><img src="images/low/amplifier.jpg" data-src="images/1280/amplifier.jpg" class="lazyload"></div>
+    <label>The amplifier was ultimately a space hog. However, at a cocked angle it fit without getting in the way of the keyboard.</label>
+
+    <div class="img-container"><img src="images/low/all-closed.jpg" data-src="images/1280/all-closed.jpg" class="lazyload"></div>
+    <label>All the components inside, it's able to be closed! Phew.</label>
+
+    <div class="img-container"><img src="images/low/hero-shot.jpg" data-src="images/1280/hero-shot.jpg" class="lazyload"></div>
+    <label>Yes, I am satisfied.</label>
+
+    <div class="img-container"><img src="images/low/with-me.jpg" data-src="images/1280/with-me.jpg" class="lazyload"></div>
+    <label>Demonstrating at Georgia Tech during the 2nd <a href="http://webaudio.gatech.edu/">Web Audio Conference</a>
+    </label>
+
+
+
+
+
 </body>
-</html>
