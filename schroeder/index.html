@@ -56,7 +56,21 @@
     </ul>
 
     <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/insta-2.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/insta-2.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/insta-2.jpg" class=" lazyload"></a></div>
-    <label>Working on the software. The piano uses samples from a wurlitzer instrument.</label>
+    <label>Ok, to the software. Here I am running it on my macbook, with the midi keyboard plugged into it.</label>
+    
+    <p>Just to be really clear, the software consists of an HTML web page, JavaScript code, and some audio files. It's literally a website. However, because I didn't want the instrument to require internet access, I packaged the code into a <a href="https://developer.chrome.com/webstore" target="_blank">Chrome web app</a>. This allows the code to be installed and run like a regular program, whether on a macbook or something lighter weight that runs ChromeOS.</p>
+    
+    <p>The reason that it's possible to relatively easily make music software using web technologies is the <a href="https://webaudio.github.io/web-audio-api/" target="_blank">Web Audio API</a>, an API that has been in development for several years. It's present in all the major browsers.</p>
+    
+    <p>The fundamental action that the software performs is converting MIDI input from the keyboard into sound. While a synthesizer could accomplish this, I wanted to simulate the Wurlitzer electric keyboard sound. To do that, I sampled the best <em>software</em> sampler of this keyboard available, Native Instruments' <a href="http://www.native-instruments.com/en/products/komplete/keys/scarbee-a200/" target="_blank">Scarbee A-200</a>. While the Scarbee has many velocity layers and individual samples for each key, I only sampled 7 velocity layers and eight or so keys across the keyboard.</p>
+    
+    <p>When a key is struck, the code looks for the closest available sample match in terms of velocity and pitch. It then adjusts the pitch of the sample to match the desired note and plays the sample. For example, say that we sampled middle C (C4), and someone strikes D4, which we don't have sampled. We need to retrieve the C4 sample at the correct velocity and adjust its playback rate to <code>293.66 / 261.63</code>, or <code>1.1224...</code>. This lets us seemingly play notes that we haven't got literal samples for, and it works well on keyboards provided that you don't need to adjust the pitch too far.</p>
+    
+    <p>Down the line I would like to sample a live Wurlitzer, at which point I could share those samples and the entirety of the code that runs Schroeder.</p>
+    
+    Because I didn't want the instrument to require inte
+    
+    Working on the software. The piano uses samples from a wurlitzer instrument.</label>
 
     <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/first-photo.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/first-photo.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/first-photo.jpg" class=" lazyload"></a></div>
     <label>March, 2014. I had built the enclosure, installed the speaker and the keyboard. I thought that was the hard part!</label>
