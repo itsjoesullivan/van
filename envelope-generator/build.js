@@ -397,7 +397,7 @@ $("#muter").on('click', function() {
     source.connect(c.destination);
 
     // play the file
-    source.noteOn(0);
+    source.start(0);
   }
   var request = $("#muter").html();
   if (request === "unmute") {
