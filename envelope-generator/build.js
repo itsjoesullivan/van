@@ -1,242 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Envelope = require('../env-gen/envelope-generator').default;
-var drawBuffer = require('draw-wave');
-var NoiseBuffer = require('noise-buffer');
-var c = new AudioContext();
-var width = document.getElementsByTagName('p')[0].offsetWidth;
-
-window.extraLength = 0.3;
-
-var muted = true;
-
-function render() {
-  var settings = {
-    attackTime: 0.1,
-    decayTime: 0.3,
-    sustainLevel: 0.8,
-    releaseTime: 0.3,
-    delayTime: 0,
-    startLevel: 0.001,
-    curve: 'exponential'
-  };
-
-  settings.attackTime = parseFloat(document.getElementById('attack-time').value);
-  settings.decayTime = parseFloat(document.getElementById('decay-time').value);
-  settings.sustainLevel = parseFloat(document.getElementById('sustain-level').value);
-  settings.releaseTime = parseFloat(document.getElementById('release-time').value);
-  settings.curve = document.getElementById('curve').value;
-
-  var duration = settings.attackTime + settings.decayTime + settings.releaseTime + extraLength;
-
-  var context = new OfflineAudioContext(1, duration * 44100, 44100);
-
-  var env = new Envelope(context, settings);
-  var noise = NoiseBuffer(1, 'white');
-  var gainNode = context.createGain();
-  var quieter = context.createGain();
-  var source = context.createBufferSource();
-  source.buffer = noise;
-  source.connect(gainNode);
-  source.loop = true;
-  env.connect(gainNode.gain);
-  gainNode.gain.value = 0;
-  source.start(0);
-  env.start(0);
-  env.release(settings.attackTime + settings.decayTime + extraLength);
-  source.stop(env.getReleaseCompleteTime());
-  gainNode.connect(quieter);
-  quieter.connect(context.destination);
-  quieter.gain.value = 1;
-  context.startRendering();
-  context.oncomplete = function(e) {
-    var buffer = e.renderedBuffer;
-    var waveSVG = drawBuffer.svg(buffer, width, width / 4, '#111');
-    $("#svg-container").empty();
-    $("#svg-container").append(waveSVG);
-    
-    if (!muted) {
-      var source = c.createBufferSource();
-      source.buffer = buffer;
-      source.start();
-      var gain = c.createGain();
-      gain.gain.value = 0.01;
-      source.connect(gain);
-      gain.connect(c.destination);
-    }
-  }
-}
-
-$('input, select').on('input', function() {
-  render();
-});
-
-render();
-render = _.debounce(render, 100);
-
-$("#muter").on('click', function() {
-  var request = $("#muter").html();
-  if (request === "unmute") {
-    $("#muter").html("mute");
-    muted = false;
-  } else {
-    $("#muter").html("unmute");
-    muted = true;
-  }
-})
-$("#play").on('click', render);
-
-},{"../env-gen/envelope-generator":7,"draw-wave":2,"noise-buffer":5}],2:[function(require,module,exports){
-module.exports = {
-  canvas: drawBuffer,
-  svg: require('./svg.js')
-};
-
-function drawBuffer (canvas, buffer, color) {
-  var ctx = canvas.getContext('2d');
-  var width = canvas.width;
-  var height = canvas.height;
-  if (color) {
-    ctx.fillStyle = color;
-  }
-
-    var data = buffer.getChannelData( 0 );
-    var step = Math.ceil( data.length / width );
-    var amp = height / 2;
-    for(var i=0; i < width; i++){
-        var min = 1.0;
-        var max = -1.0;
-        for (var j=0; j<step; j++) {
-            var datum = data[(i*step)+j];
-            if (datum < min)
-                min = datum;
-            if (datum > max)
-                max = datum;
-        }
-      ctx.fillRect(i,(1+min)*amp,1,Math.max(1,(max-min)*amp));
-    }
-}
-},{"./svg.js":3}],3:[function(require,module,exports){
-var createEl = require('svg-create-element');
-
-module.exports = drawBufferSVG;
-
-function getRect(x, y, width, height, color) {
-  return createEl('rect', {
-    x: x,
-    y: y,
-    width: width,
-    height: height,
-    fill: color
-  });
-}
-
-function drawBufferSVG(buffer, width, height, color) {
-  if (!color) color = '#000';
-
-  var svgEl = createEl('svg', {
-    width: width,
-    height: height
-  });
-
-  svgEl.style.display = "block";
-
-  var g = createEl('g');
-
-  svgEl.appendChild(g);
-
-  var data = buffer.getChannelData( 0 );
-  var step = Math.ceil( data.length / width );
-  var amp = height / 2;
-  for (var i=0; i < width; i++) {
-    var min = 1.0;
-    var max = -1.0;
-    for (var j=0; j<step; j++) {
-      var datum = data[(i*step)+j];
-      if (datum < min)
-        min = datum;
-      if (datum > max)
-        max = datum;
-    }
-    g.appendChild(getRect(i, (1+min)*amp, 1, Math.max(1,(max-min)*amp), color));
-  }
-
-  return svgEl;
-}
-},{"svg-create-element":6}],4:[function(require,module,exports){
-var hasOwn = Object.prototype.hasOwnProperty;
-
-
-module.exports = function has(obj, property) {
-  return hasOwn.call(obj, property);
-};
-
-},{}],5:[function(require,module,exports){
-// courtesy of http://noisehack.com/generate-noise-web-audio-api/
-module.exports = function(length, type) {
-  type = type || 'white';
-
-  var sampleRate = 44100;
-  var samples = length * sampleRate;
-  var context = new OfflineAudioContext(1, samples, sampleRate);
-  var noiseBuffer = context.createBuffer(1, samples, sampleRate);
-  var output = noiseBuffer.getChannelData(0);
-
-  switch(type) {
-    case 'white':
-      // http://noisehack.com/generate-noise-web-audio-api/
-      for (var i = 0; i < samples; i++) {
-        output[i] = Math.random() * 2 - 1;
-      }
-      break;
-    case 'pink':
-      // just completely http://noisehack.com/generate-noise-web-audio-api/
-      var b0, b1, b2, b3, b4, b5, b6;
-      b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
-      for (var i = 0; i < samples; i++) {
-        var white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-        output[i] *= 0.11; // (roughly) compensate for gain
-        b6 = white * 0.115926;
-      }
-      break;
-    case 'brown':
-      // just completely http://noisehack.com/generate-noise-web-audio-api/
-      var lastOut = 0.0;
-      for (var i = 0; i < samples; i++) {
-        var white = Math.random() * 2 - 1;
-        output[i] = (lastOut + (0.02 * white)) / 1.02;
-        lastOut = output[i];
-        output[i] *= 3.5; // (roughly) compensate for gain
-      }
-      break;
-  }
-
-  return noiseBuffer;
-};
-
-},{}],6:[function(require,module,exports){
-var has = require('has');
-
-module.exports = function (name, attr) {
-    var elem = document.createElementNS('http://www.w3.org/2000/svg', name);
-    if (!attr) return elem;
-    for (var key in attr) {
-        if (!has(attr, key)) continue;
-        var nkey = key.replace(/([a-z])([A-Z])/g, function (_, a, b) {
-            return a + '-' + b.toLowerCase();
-        });
-        elem.setAttribute(nkey, attr[key]);
-    }
-    return elem;
-}
-
-},{"has":4}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -266,11 +28,24 @@ var Envelope = function () {
     this.source = this._getOnesBufferSource();
     this.attackDecayNode = context.createGain();
     this.releaseNode = context.createGain();
+    this.ampNode = context.createGain();
+    this.outputNode = context.createGain();
+
+    this.outputNode.gain.value = this.settings.startLevel;
+    this.ampNode.gain.value = this.settings.maxLevel - this.settings.startLevel;
 
     // Set up graph
     this.source.connect(this.attackDecayNode);
+    this.source.connect(this.outputNode);
     this.attackDecayNode.connect(this.releaseNode);
+    this.releaseNode.connect(this.ampNode);
+    this.ampNode.connect(this.outputNode.gain);
   }
+
+  /**
+   * Deal w/ settings object
+   */
+
 
   _createClass(Envelope, [{
     key: '_setDefaults',
@@ -290,8 +65,14 @@ var Envelope = function () {
       if (typeof this.settings.startLevel !== 'number') {
         this.settings.startLevel = 0;
       }
-      if (this.settings.startLevel === 0) {
-        this.settings.startLevel = 0.001;
+      // maxLevel
+      if (typeof this.settings.maxLevel !== 'number') {
+        this.settings.maxLevel = 1;
+      }
+
+      // sustainLevel
+      if (typeof this.settings.sustainLevel !== 'number') {
+        this.settings.sustainLevel = 1;
       }
 
       // attackTime
@@ -308,21 +89,40 @@ var Envelope = function () {
       if (typeof this.settings.decayTime !== 'number') {
         this.settings.decayTime = 0;
       }
-      if (this.settings.decayTime === 0) {
-        this.settings.decayTime = 0.001;
-      }
-
-      // sustainLevel
-      if (typeof this.settings.sustainLevel !== 'number') {
-        this.settings.sustainLevel = 1;
-      }
-      if (this.settings.sustainLevel === 0) {
-        this.settings.sustainLevel = 0.001;
-      }
 
       // releaseTime
       if (typeof this.settings.releaseTime !== 'number') {
         this.settings.releaseTime = 0;
+      }
+
+      // startLevel must not be zero if attack curve is exponential
+      if (this.settings.startLevel === 0 && this._getRampMethodName('attack') === 'exponentialRampToValueAtTime') {
+        if (this.settings.maxLevel < 0) {
+          this.settings.startLevel = -0.001;
+        } else {
+          this.settings.startLevel = 0.001;
+        }
+      }
+
+      // maxLevel must not be zero if attack, decay, or release curve is exponential
+      if (this.settings.maxLevel === 0 && (this._getRampMethodName('attack') === 'exponentialRampToValueAtTime' || this._getRampMethodName('decay') === 'exponentialRampToValueAtTime' || this._getRampMethodName('release') === 'exponentialRampToValueAtTime')) {
+        if (this.settings.startLevel < 0) {
+          this.settings.maxLevel = -0.001;
+        } else {
+          this.settings.maxLevel = 0.001;
+        }
+      }
+
+      // sustainLevel must not be zero if decay or release curve is exponential
+      if (this.settings.sustainLevel === 0 && (this._getRampMethodName('decay') === 'exponentialRampToValueAtTime' || this._getRampMethodName('release') === 'exponentialRampToValueAtTime')) {
+        // No need to be negative here as it's a multiplier
+        this.settings.sustainLevel = 0.001;
+      }
+
+      // decayTime must not be zero to avoid colliding with attack curve events
+      if (this.settings.decayTime === 0) {
+
+        this.settings.decayTime = 0.001;
       }
     }
 
@@ -338,9 +138,13 @@ var Envelope = function () {
     value: function _getOnesBufferSource() {
       var context = this.context;
 
-      // Generate buffer, setting its one sample to 1
-      var onesBuffer = context.createBuffer(1, 1, context.sampleRate);
-      onesBuffer.getChannelData(0)[0] = 1;
+      // Generate buffer, setting its samples to 1
+      // Needs to be 2 for safari!
+      // Hat tip to https://github.com/mmckegg/adsr
+      var onesBuffer = context.createBuffer(1, 2, context.sampleRate);
+      var data = onesBuffer.getChannelData(0);
+      data[0] = 1;
+      data[1] = 1;
 
       // Create a source for the buffer, looping it
       var source = context.createBufferSource();
@@ -360,7 +164,7 @@ var Envelope = function () {
   }, {
     key: 'connect',
     value: function connect(targetParam) {
-      this.releaseNode.connect(targetParam);
+      this.outputNode.connect(targetParam);
     }
 
     /**
@@ -380,8 +184,13 @@ var Envelope = function () {
       var decayStartsAt = attackEndsAt + this.settings.holdTime;
       var decayEndsAt = decayStartsAt + this.settings.decayTime;
 
-      this.attackDecayNode.gain.setValueAtTime(this.settings.startLevel, when);
-      this.attackDecayNode.gain.setValueAtTime(this.settings.startLevel, attackStartsAt);
+      var attackStartLevel = 0;
+      if (attackRampMethodName === "exponentialRampToValueAtTime") {
+        attackStartLevel = 0.001;
+      }
+
+      this.attackDecayNode.gain.setValueAtTime(attackStartLevel, when);
+      this.attackDecayNode.gain.setValueAtTime(attackStartLevel, attackStartsAt);
       this.attackDecayNode.gain[attackRampMethodName](1, attackEndsAt);
       this.attackDecayNode.gain.setValueAtTime(1, decayStartsAt);
       this.attackDecayNode.gain[decayRampMethodName](this.settings.sustainLevel, decayEndsAt);
@@ -458,10 +267,19 @@ var Envelope = function () {
 
       var rampMethodName = this._getRampMethodName('release');
 
-      this.releaseNode.gain.setValueAtTime(1, when);
-      this.releaseNode.gain[rampMethodName](this.settings.startLevel, releaseEndsAt);
+      var releaseTargetLevel = 0;
 
-      this.source.stop(releaseEndsAt);
+      if (rampMethodName === "exponentialRampToValueAtTime") {
+        releaseTargetLevel = 0.001;
+      }
+
+      this.releaseNode.gain.setValueAtTime(1, when);
+      this.releaseNode.gain[rampMethodName](releaseTargetLevel, releaseEndsAt);
+    }
+  }, {
+    key: 'stop',
+    value: function stop(when) {
+      this.source.stop(when);
     }
 
     /**
@@ -486,4 +304,261 @@ var Envelope = function () {
 exports.default = Envelope;
 
 
-},{}]},{},[1]);
+},{}],2:[function(require,module,exports){
+var Envelope = require('../../../env-gen/envelope-generator').default;
+var drawBuffer = require('draw-wave');
+var NoiseBuffer = require('noise-buffer');
+var c = new AudioContext();
+var width = document.getElementsByTagName('p')[0].offsetWidth;
+
+window.extraLength = 0.3;
+
+var muted = true;
+
+function render() {
+  var settings = {
+    attackTime: 0.1,
+    decayTime: 0.3,
+    sustainLevel: 0.8,
+    releaseTime: 0.3,
+    delayTime: 0,
+    curve: 'exponential'
+  };
+
+  settings.attackTime = parseFloat(document.getElementById('attack-time').value);
+  settings.decayTime = parseFloat(document.getElementById('decay-time').value);
+  settings.sustainLevel = parseFloat(document.getElementById('sustain-level').value);
+  settings.releaseTime = parseFloat(document.getElementById('release-time').value);
+  settings.curve = document.getElementById('curve').value;
+
+  var duration = settings.attackTime + settings.decayTime + settings.releaseTime + extraLength;
+
+  var context = new OfflineAudioContext(1, duration * 44100, 44100);
+
+  var env = new Envelope(context, settings);
+  var noise = NoiseBuffer(1, 'white');
+  // good here
+  var gainNode = context.createGain();
+  var quieter = context.createGain();
+  var source = context.createBufferSource();
+  source.buffer = noise;
+  source.connect(gainNode);
+  source.loop = true;
+  env.connect(gainNode.gain);
+  gainNode.gain.value = 0;
+  source.start(0);
+  env.start(0);
+  env.release(settings.attackTime + settings.decayTime + extraLength);
+  source.stop(env.getReleaseCompleteTime());
+  gainNode.connect(quieter);
+  quieter.connect(context.destination);
+  quieter.gain.value = 1;
+  context.startRendering();
+  context.oncomplete = function(e) {
+    var buffer = e.renderedBuffer;
+    var waveSVG = drawBuffer.svg(buffer, width, width / 4, '#111');
+    $("#svg-container").empty();
+    $("#svg-container").append(waveSVG);
+    
+    if (!muted) {
+      var source = c.createBufferSource();
+      source.buffer = buffer;
+      source.start();
+      var gain = c.createGain();
+      gain.gain.value = 0.03;
+      source.connect(gain);
+      gain.connect(c.destination);
+    }
+  };
+}
+
+$('input, select').on('input', function() {
+  render();
+});
+
+render();
+render = _.debounce(render, 250);
+
+var unmutedYet = false;
+
+$("#muter").on('click', function() {
+  if (!unmutedYet) {
+    unmutedYet = true;
+    buffer = c.createBuffer(1, 2, 44100);
+    buffer.getChannelData(0)[0] = 0.0000001;
+    buffer.getChannelData(0)[1] = -0.000001;
+
+    // create new buffer source for playback with an already
+    // loaded and decoded empty sound file
+    var source = c.createBufferSource();
+    source.buffer = buffer;
+
+    // connect to output (your speakers)
+    source.connect(c.destination);
+
+    // play the file
+    source.noteOn(0);
+  }
+  var request = $("#muter").html();
+  if (request === "unmute") {
+    $("#muter").html("mute");
+    muted = false;
+  } else {
+    $("#muter").html("unmute");
+    muted = true;
+  }
+})
+$("#play").on('click', render);
+
+},{"../../../env-gen/envelope-generator":1,"draw-wave":3,"noise-buffer":6}],3:[function(require,module,exports){
+module.exports = {
+  canvas: drawBuffer,
+  svg: require('./svg.js')
+};
+
+function drawBuffer (canvas, buffer, color) {
+  var ctx = canvas.getContext('2d');
+  var width = canvas.width;
+  var height = canvas.height;
+  if (color) {
+    ctx.fillStyle = color;
+  }
+
+    var data = buffer.getChannelData( 0 );
+    var step = Math.ceil( data.length / width );
+    var amp = height / 2;
+    for(var i=0; i < width; i++){
+        var min = 1.0;
+        var max = -1.0;
+        for (var j=0; j<step; j++) {
+            var datum = data[(i*step)+j];
+            if (datum < min)
+                min = datum;
+            if (datum > max)
+                max = datum;
+        }
+      ctx.fillRect(i,(1+min)*amp,1,Math.max(1,(max-min)*amp));
+    }
+}
+},{"./svg.js":4}],4:[function(require,module,exports){
+var createEl = require('svg-create-element');
+
+module.exports = drawBufferSVG;
+
+function getRect(x, y, width, height, color) {
+  return createEl('rect', {
+    x: x,
+    y: y,
+    width: width,
+    height: height,
+    fill: color
+  });
+}
+
+function drawBufferSVG(buffer, width, height, color) {
+  if (!color) color = '#000';
+
+  var svgEl = createEl('svg', {
+    width: width,
+    height: height
+  });
+
+  svgEl.style.display = "block";
+
+  var g = createEl('g');
+
+  svgEl.appendChild(g);
+
+  var data = buffer.getChannelData( 0 );
+  var step = Math.ceil( data.length / width );
+  var amp = height / 2;
+  for (var i=0; i < width; i++) {
+    var min = 1.0;
+    var max = -1.0;
+    for (var j=0; j<step; j++) {
+      var datum = data[(i*step)+j];
+      if (datum < min)
+        min = datum;
+      if (datum > max)
+        max = datum;
+    }
+    g.appendChild(getRect(i, (1+min)*amp, 1, Math.max(1,(max-min)*amp), color));
+  }
+
+  return svgEl;
+}
+},{"svg-create-element":7}],5:[function(require,module,exports){
+var hasOwn = Object.prototype.hasOwnProperty;
+
+
+module.exports = function has(obj, property) {
+  return hasOwn.call(obj, property);
+};
+
+},{}],6:[function(require,module,exports){
+// courtesy of http://noisehack.com/generate-noise-web-audio-api/
+module.exports = function(length, type) {
+  type = type || 'white';
+
+  var sampleRate = 44100;
+  var samples = length * sampleRate;
+  var context = new OfflineAudioContext(1, samples, sampleRate);
+  var noiseBuffer = context.createBuffer(1, samples, sampleRate);
+  var output = noiseBuffer.getChannelData(0);
+
+  switch(type) {
+    case 'white':
+      // http://noisehack.com/generate-noise-web-audio-api/
+      for (var i = 0; i < samples; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      break;
+    case 'pink':
+      // just completely http://noisehack.com/generate-noise-web-audio-api/
+      var b0, b1, b2, b3, b4, b5, b6;
+      b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+      for (var i = 0; i < samples; i++) {
+        var white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        output[i] *= 0.11; // (roughly) compensate for gain
+        b6 = white * 0.115926;
+      }
+      break;
+    case 'brown':
+      // just completely http://noisehack.com/generate-noise-web-audio-api/
+      var lastOut = 0.0;
+      for (var i = 0; i < samples; i++) {
+        var white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5; // (roughly) compensate for gain
+      }
+      break;
+  }
+
+  return noiseBuffer;
+};
+
+},{}],7:[function(require,module,exports){
+var has = require('has');
+
+module.exports = function (name, attr) {
+    var elem = document.createElementNS('http://www.w3.org/2000/svg', name);
+    if (!attr) return elem;
+    for (var key in attr) {
+        if (!has(attr, key)) continue;
+        var nkey = key.replace(/([a-z])([A-Z])/g, function (_, a, b) {
+            return a + '-' + b.toLowerCase();
+        });
+        elem.setAttribute(nkey, attr[key]);
+    }
+    return elem;
+}
+
+},{"has":5}]},{},[2]);
