@@ -47,7 +47,9 @@ function render() {
   gainNode.connect(quieter);
   quieter.connect(context.destination);
   quieter.gain.value = 1;
-  context.startRendering().then(function(buffer) {
+  context.startRendering();
+  context.oncomplete = function(e) {
+    var buffer = e.renderedBuffer;
     var waveSVG = drawBuffer.svg(buffer, width, width / 4, '#111');
     $("#svg-container").empty();
     $("#svg-container").append(waveSVG);
@@ -61,7 +63,7 @@ function render() {
       source.connect(gain);
       gain.connect(c.destination);
     }
-  });
+  }
 }
 
 $('input, select').on('input', function() {
