@@ -71,7 +71,7 @@ $('input, select').on('input', function() {
 });
 
 render();
-render = _.debounce(render, 500);
+render = _.debounce(render, 100);
 
 $("#muter").on('click', function() {
   var request = $("#muter").html();
