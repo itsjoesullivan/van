@@ -1,10 +1,202 @@
 <!doctype html>
 <html>
 <head>
-<title>schroeder - joesul.li/van</title>
-<link rel='stylesheet' href='style.css' />
-<script type="text/javascript">
+    <title>Schroeder: an electric piano built on web technologies.</title>
+    <meta name="viewport" content="width=device-width">
+    <!--script src="https://code.jquery.com/jquery-1.12.0.min.js"></script-->
+    <script src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/lazysizes.min.js" async></script>
+    <style>
+        img {
+            width: 100%;
+        }
+        html {
+            background-color: white;
+            font-family: verdana;
+            margin: 1em;
+        }
+        body {
+            max-width: 640px;
+            margin: auto;
+        }
+        label {
+            display: block;
+        }
+        label, p, li {
+            margin-bottom: 2em;
+        }
+        .img-container {
+          overflow: hidden;
+        }
+    </style>
+    <script>
+        // When javascript is running, add a blur over the lo-res images
+        // anticipating their quick replacement w/ high-res.
+        style = document.createElement('style');
+        style.innerHTML = ".lazyload, .lazyloading { -webkit-filter: blur(5px); filter: blur(5px); }";
+        document.getElementsByTagName('head')[0].appendChild(style);
+    </script>
+</head>
 
+<body>
+    <h1>Schroeder</h1>
+    <h2>DIY Electronic Piano using ChromeOS</h2>
+
+    <a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/hero-shot.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/hero-shot.jpg"></a>
+
+    <p>The goal of this project is to create a physical musical instrument that is powered by web—as in world wide web—technologies. The best case scenario would be that you plug the keyboard in, wait for it to boot up, and then you can play the keyboard just like a piano.</p>
+    
+    <p>Ultimately, there are still some kinks to work out, especially around making the underlying technology transparent to the musician. That said, below is a collection of photos and information that I hope will explain how Schroeder works, and how you could create a web-powered instrument yourself.</p>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/insta-1.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/insta-1.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/insta-1.jpg" class=" lazyload"></a></div>
+    <label>October 31, 2013: the earliest photo I have of the project. On display are a number of the fundamental design decisions that would direct the rest of the project.</label>
+    
+    <ul>
+        <li>The enclosure is a wooden box 16" x 12" x 2.5" in dimensions. The top and bottom are composed of <a href="https://en.wikipedia.org/wiki/Medium-density_fibreboard" target="_blank">medium-density fiberboard</a>, 1/4" thick. The sides are cut from lengths of 2" x 1" common wood. All very inexpensive stuff. A handsaw, an electric drill, and a hack saw (for the tighter spaces) were sufficient for 99% of the woodworking. I would quickly realize that the dimensions of the enclosure were very optimistic in terms of what I could fit inside it.</li>
+        <li>The keyboard was acquired by taking apart a <a href="http://www.korg.com/us/products/controllers/microkey/">Korg microKEY</a> MIDI controller. I don't know another practical way to get a keyboard with USB out. I used consumer parts throughout this project, including here. The upsides are ease of interconnectivity, reasonable assurance of quality, and availability. The big downside is that it's more expensive than finding suppliers for the individual parts. But this isn't a factory, so it's not likely that sourcing components for a single unit would have been cost effective.</li>
+    </ul>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/insta-2.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/insta-2.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/insta-2.jpg" class=" lazyload"></a></div>
+    <label>Ok, to the software. Here I am running it on my macbook, with the midi keyboard plugged into it.</label>
+    
+    <p>Just to be really clear, the software consists of an HTML web page, JavaScript code, and some audio files. It's literally a website. However, because I didn't want the instrument to require internet access, I packaged the code into a <a href="https://developer.chrome.com/webstore" target="_blank">Chrome web app</a>. This allows the code to be installed and run like a regular program, whether on a macbook or something lighter weight that runs ChromeOS.</p>
+    
+    <p>The reason that it's possible to relatively easily make music software using web technologies is the <a href="https://webaudio.github.io/web-audio-api/" target="_blank">Web Audio API</a>, an API that has been in development for several years. It's present in all the major browsers.</p>
+    
+    <p>The fundamental action that the software performs is converting MIDI input from the keyboard into sound. While a synthesizer could accomplish this, I wanted to simulate the Wurlitzer electric keyboard sound. To do that, I sampled the best software sampler of this keyboard available, Native Instruments' <a href="http://www.native-instruments.com/en/products/komplete/keys/scarbee-a200/" target="_blank">Scarbee A-200</a>. While the Scarbee has many velocity layers and individual samples for each key, I only sampled 7 velocity layers and eight or so keys across the keyboard.</p>
+    
+    <p>When a key is struck, the code looks for the closest available sample match in terms of velocity and pitch. It then adjusts the pitch of the sample to match the desired note and plays the sample. For example, say that we sampled middle C (C4), and someone strikes D4, which we don't have sampled. We need to retrieve the C4 sample at the correct velocity and adjust its playback rate to <code>293.66 / 261.63</code>, or <code>1.1224...</code>. This lets us seemingly play notes that we haven't got literal samples for, and it works well on keyboards provided that you don't need to adjust the pitch too far.</p>
+    
+    <p>Down the line I would like to sample a live Wurlitzer, at which point I could share those samples and the entirety of the code that runs Schroeder.</p>
+    
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/first-photo.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/first-photo.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/first-photo.jpg" class=" lazyload"></a></div>
+    <label>March, 2014. I had built the enclosure, installed the speaker and the keyboard. I thought that was the hard part!</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chrome-box.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/chrome-box.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chrome-box.jpg" class=" lazyload"></a></div>
+    <label>The brand new Chromebox arrives. The perfect platform for a hardware web audio project.</label>
+
+    <div class="img-container"><a href="images/1280/chromebox-fitting.jpg"><img src="images/low/chromebox-fitting.jpg" data-src="images/1280/chromebox-fitting.jpg" class="lazyload"></a></div>
+    <label>Chromebox gets its first fitting. You can see a little piece of paper with "amp" written on it. I mocked up all the components I thought I would need and laid them out inside the enclosure. This ended up being an exercise in rationalization, as (1) I wasn't yet aware of all the components I would need and (2) as you can see from the speaker attached to the lid, there were actually two layers of components occupying 3d space. The paper hardly mimicked that.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chromebox-fitting-2.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/chromebox-fitting-2.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chromebox-fitting-2.jpg" class="lazyload"></a></div>
+    <label>The Chromebox was just a bit too tall for the enclosure. Newer Chromeboxes are actually slimmer, but as we'll see below, there are other alternatives.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/hdmi.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/hdmi.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/hdmi.jpg" class="lazyload"></a></div>
+    <label>More work on the software. The Chromebox only has an HDMI video out, so testing it required the use of my television. At this point I am sure that this television won't fit inside the enclosure.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chromebox-2.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/chromebox-2.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chromebox-2.jpg" class="lazyload"></a></div>
+    <label>Desperate times...</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/big-hole.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/big-hole.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/big-hole.jpg" class="lazyload"></a></div>
+    <label>...call for desperate measures. A hole is cut in the top of the enclosure to make room for the Chromebox.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chic.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/chic.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chic.jpg" class="lazyload"></a></div>
+    <label>Chic.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/admiring.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/admiring.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/admiring.jpg" class="lazyload"></a></div>
+    <label>April, 2014. Admiring my handiwork. However, there are still a number of external dependencies, evidenced by the cables extending to the right. Aside from power for the Chromebox and the amplifier, there is a keyboard, mouse, and television connected to Schroeder. Turning the instrument on required launching the application with a mouse, which also required having a screen hooked up in order to see what I was doing. This is not the transparent technology that I was shooting for.</label>
+
+    <p>The project slumbered for over a year. In January, 2015, IRCAM held <a href="http://wac.ircam.fr/">the first Web Audio Conference</a>.</p>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chromebook.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/chromebook.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/chromebook.jpg" class="lazyload"></a></div>
+    <label>In August, 2015 I purchased a touchscreen Chromebook. Maybe this will be the ultimate platform for a hardware web audio project. I dusted off my enclosure and plugged in the Chromebook, loading up <a href="https://twitter.com/luketeaford">Luke Teaford</a>'s <a href="http://luketeaford.com/apps/tanguy/">Tanguy</a>, which Luke had demonstrated at IRCAM. Low latency: check; touchscreen: check. This solved the problem of requiring an external screen. However, it didn't seem feasible to integrate the Chromebook into the enclosure. The screen, while awesome, just took up too much space, not to mention the laptop underneath it. I was stubborn about retaining the enclosure as-is because I did not want to build a new one.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/all-together.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/all-together.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/all-together.jpg" class="lazyload"></a></div>
+    <label>January, 2016. I had submitted Schroeder to the 2nd Web Audio Conference, to be held at Georgia Tech. I began to get nervous about how to fit the entire thing inside the enclosure. Luckily, last November Google had released a new ChromeOS form factor: Chromebit. This finally felt like the ultimate platform for a hardware web audio project! I picked up a touch-enabled HDMI screen from Adafruit, and an HDMI splitter to provide an analog audio out. Here is the test drive of what would be the final hardware. The Chromebit is that thumbdrive-looking thing attached to the white box near the center of the image. Not only is it performing all the hard work of converting MIDI signals into audio, but it's also powering all of the devices attached to it: the MIDI keyboard, the HDMI splitter, and the touchscreen display. Only the amplifier at the top left requires its own power supply.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/screen-one.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/screen-one.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/screen-one.jpg" class="lazyload"></a></div>
+    <label>Starting to think about space. The screen can be mounted on the top along with the speaker and amplifier. Note all the excess cabling! You can see the Chromebit just above the keyboard. It's not much larger than a thumbdrive.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/sans-cable.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/sans-cable.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/sans-cable.jpg" class="lazyload"></a></div>
+    <label>Moving the components to the enclosure. Notice there's a new MDF top, as the old one has a giant hole cut in it for the Chromebox. Without cables, these components appear to fit. Eventually I would replace the monstrous USB hub in the center with a smaller one.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-1.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-1.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-1.jpg" class="lazyload"></a></div>
+    <label>Preparing to add the tolex cover. Applying the tolex was an incredibly time consuming process. <a href="http://guitarkitbuilder.com/how-apply-tolex-guitar-amplifier-cabinet/" target="_blank">here</a> is a very helpful resource for applying tolex. Had I read it more closely I could have saved myself a lot of time. I bought two yards of <a href="http://www.mojotone.com/amp-parts/tolex-tweed-brand-fender-style/Fender-Style-Black-Tolex-54-W">this</a>, though I could have gotten by (easily) with just one.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-2.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-2.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-2.jpg" class="lazyload"></a></div>
+    <label>Rubber cement. Next time I will use a non-toxic version.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-3.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-3.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-3.jpg" class="lazyload"></a></div>
+    <label>Cut to size.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-5.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-5.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-5.jpg" class="lazyload"></a></div>
+    <label>And it's just like wrapping a present.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-4.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-4.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-4.jpg" class="lazyload"></a></div>
+    <label>Bigger pieces now. You can see that there is plenty of tolex left over. Hey, check out my carpet!</label>
+
+    <!--div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-6.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-6.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-6.jpg" class="lazyload"></a></div>
+    <label>Multi-tasking. Note the change jar as a weight. For the record, this isn't how rubber cement works. You're supposed to apply a layer of it, let it dry a little bit, and then stick the surfaces together. The bond should form instantaneously.</label-->
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-7.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-7.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-7.jpg" class="lazyload"></a></div>
+    <label>I just used common sense in working with the tolex. Don't cut away too much at once and it was a forgiving process.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/more-software.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/more-software.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/more-software.jpg" class="lazyload"></a></div>
+    <label>Revisiting the software in 2016. The <a href="https://webaudio.github.io/web-midi-api/" target="_blank">Web MIDI API</a>, something of a companion to the Web Audio API, had shifted a little. The goal of this project was to create an optimal performance interface, and one of the trade-offs was that as a development platform it leaves much to be desired. Because this is running on ChromeOS, I did development on my own laptop, then <a target="_blank" href="https://developer.chrome.com/webstore/publish">deployed the actual app to the Chrome Web Store</a>. Within 30 minutes or so, the Chromebit updates itself, and I can test the app. This is a painfully slow iteration loop, especially if you make a silly typo. But that's what's available.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-sides.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-sides.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-sides.jpg" class="lazyload"></a></div>
+    <label>The side of the enclosure have their tolex covering.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/my-workshop.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/my-workshop.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/my-workshop.jpg" class="lazyload"></a></div>
+    <label>My workshop!</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/my-workshop-2.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/my-workshop-2.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/my-workshop-2.jpg" class="lazyload"></a></div>
+    <label>Working in an apartment, sawdust needs to be contained. <a href="https://cdn.meme.am/instances/500x/67745181.jpg" target="_blank">Saw over a box!</a>
+    </label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-almost-done.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/tolex-almost-done.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/tolex-almost-done.jpg" class="lazyload"></a></div>
+    <label>Tolex application almost complete.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/enclosure-finished.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/enclosure-finished.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/enclosure-finished.jpg" class="lazyload"></a></div>
+    <label>Enclosure is complete. I bailed on the rubber cement because I was afraid of the fumes, so you can see Gorilla tape on the top. Note the hinges. Whereas a guitar amp usually has all of its sides screwed in, I needed the top of the instrument to fold back for two reasons. First, I needed access to the touchscreen on the underside. Second, I knew I would be flying with the instrument, and it would be very important to be able to quickly show TSA that the scary mess of homemade electronics underneath was quite harmless. As it turns out, it drew only a little more attention from security than usual.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/enclosure-closed.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/enclosure-closed.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/enclosure-closed.jpg" class="lazyload"></a></div>
+    <label>Enclosure closed.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/components-top.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/components-top.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/components-top.jpg" class="lazyload"></a></div>
+    <label>Installing components: top half.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/components-bottom.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/components-bottom.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/components-bottom.jpg" class="lazyload"></a></div>
+    <label>Installing components: bottom half.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-1.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/keyboard-1.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-1.jpg" class="lazyload"></a></div>
+    <label>Time to cannibalize the keyboard.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-2.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/keyboard-2.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-2.jpg" class="lazyload"></a></div>
+    <label>Remove the screws!</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-3.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/keyboard-3.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-3.jpg" class="lazyload"></a></div>
+    <label>Remove the inside screws!</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-4.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/keyboard-4.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-4.jpg" class="lazyload"></a></div>
+    <label>Voila! The breakout board (top left) has the USB port.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-5.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/keyboard-5.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/keyboard-5.jpg" class="lazyload"></a></div>
+    <label>A match made in heaven.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/all-top.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/all-top.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/all-top.jpg" class="lazyload"></a></div>
+    <label>Seeking an efficient way to place the components. The space at the right is taken up by the speaker when closed. Also trying to make sure the Chromebit takes center stage.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/cable-notch.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/cable-notch.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/cable-notch.jpg" class="lazyload"></a></div>
+    <label>I created a little notch for the power cables to enter the enclosure.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/amplifier.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/amplifier.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/amplifier.jpg" class="lazyload"></a></div>
+    <label>The amplifier was ultimately a space hog. However, at a jaunty angle it fit without getting in the way of the keyboard.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/all-closed.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/all-closed.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/all-closed.jpg" class="lazyload"></a></div>
+    <label>All the components inside, it's able to be closed! Phew.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/hero-shot.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/hero-shot.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/hero-shot.jpg" class="lazyload"></a></div>
+    <label>Yes, I am satisfied.</label>
+
+    <div class="img-container"><a href="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/with-me.jpg"><img src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/low/with-me.jpg" data-src="http://dtzrp8ssnmsm.cloudfront.net/van/schroeder/images/1280/with-me.jpg" class="lazyload"></a></div>
+    <label>Demonstrating at Georgia Tech during the 2nd <a href="http://webaudio.gatech.edu/">Web Audio Conference</a>
+    </label>
+
+
+
+
+
+<script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-31945659-1']);
   _gaq.push(['_trackPageview']);
@@ -15,37 +207,7 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 </script>
-<!-- AddThis Smart Layers BEGIN -->
-<!-- Go to http://www.addthis.com/get/smart-layers to customize -->
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-50c9eb264657aaed"></script>
-<script type="text/javascript">
-  addthis.layers({
-    'theme' : 'transparent',
-    'share' : {
-      'position' : 'right',
-      'numPreferredServices' : 3
-    }   
-  });
-</script>
-<!-- AddThis Smart Layers END -->
-</head>
-<body>
-  <div class="banner">
-  <img src='banner2.jpg' />
-  </div>
-  <div class='hero'>schroeder</div>
-  <div class="copy">
-    <p>Schroeder is a hardware music keyboard built on a web stack.</p>
-    <h2>The stack</h2>
-    <p>Under the cover is a Chromebox running an app I developed 'specially for schroeder</p>
-    <p>The other hardware is a midi keyboard ( <a target="_blank" href="http://www.korg.com/us/products/controllers/microkey/">a Korg microKEY 25</a> ), an amp and speaker, and a wooden case.</p>
 
-    <h2>The app</h2>
-    <p>The app is a Chrome packaged app. It uses the USB API to listen to the keyboard (<a target="_blank" href="https://gist.github.com/itsjoesullivan/8064641">here's a gist to the code for that</a>), maps notes/velocity to audio files, and uses the Web Audio API to play them.</p>
-    <p>It's written in coffeescript and does a little requirejs'ing.</p>
 
-    <h2>The sound</h2>
-    <p>Much as I'd have liked to record a wurlitzer myself, I ended up sampling the <a target="_blank" href="http://www.native-instruments.com/en/products/komplete/keys/scarbee-a200/artists/">Scarbee A-200</a> virtual instrument instead.</p>
-  </div>
 </body>
 </html>

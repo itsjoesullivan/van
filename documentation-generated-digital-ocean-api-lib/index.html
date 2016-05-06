@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+  <head>
+  <link rel="stylesheet" href="../tale-of-no-clocks/style.css" />
+    <meta name="viewport" content="width=device-width">
+  <title>Digital Ocean Documentation-Generated API Library</title>
+  </head>
+  <body>
+<header>
+<a href="http://joesul.li/van">joesul.li/van</a>
+</header>
+    <article>
+<h1>Digital Ocean Documentation-Generated API Library</h1>
+<p class="byline"><a href="/van">Joe Sullivan</a></p>
+<p>
+The <a href="https://developers.digitalocean.com/documentation/v2/">Digital Ocean API documentation</a> is good: it describes each endpoint in a fairly structured way, provides curl examples, and fits on a single page. It's so good, in fact, that I wondered if I could build a library to the API by scraping it. Here are the results, which include a complete <a href="https://github.com/itsjoesullivan/digital-ocean-api-v2">node.js library</a> and a <a href="https://github.com/itsjoesullivan/digital-ocean-wrench">CLI</a> to it.
+</p>
+<h2>Overview</h2>
+<p>
+The approach that I landed on has two pieces: convert the HTML of the documentation into JSON describing the API, then write an NPM package to read that JSON upon initialization and expose each action to the consumer.
+</p>
+<h2>HTML to JSON</h2>
+<p>
+Each API action consists of, at most, a path, a method, and a list of properties to be sent in the body. Below is a JSON representation of one of the more complex operations, transfering an image from one data center to another: 
+</p>
+<pre><code class="json">{
+  "name": "transferImage",
+  "path": "/v2/images/$IMAGE_ID/actions",
+  "method": "POST",
+  "requiredResourceIdCount": 1,
+  "requiredProperties": [
+    {
+      "name": "type",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "region",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "staticProperties": {
+    "type": "transfer"
+  }
+}</code></pre>
+<p>
+(<a href="https://developers.digitalocean.com/documentation/v2/#transfer-an-image">Here's</a> the Digital Ocean documentation for that action.)
+</p>
+<p>
+A few notes on the model:
+</p>
+<ul>
+  <li>The path can contain one or more ID fields. See <code>$IMAGE_ID</code> above.</li>
+  <li>The body may need certain properties' values to be set (e.g. <code class='json'>{type: "transfer"}</code> is what conveys that this is a transfer operation). In the model, the <code>staticProperties</code> property holds these values.</li>
+  <li>Certain parameters (under <code>requiredProperties</code>) may be required to perform the request. Above, <code>type</code> is already supplied, but <code>region</code> is required as well.</li>
+</ul>
+</p>
+<p>
+I won't go into the actual process of parsing the HTML. It's a little messy, but straightforward. I used <a href="https://github.com/cheeriojs/cheerio">cheerio</a>, and all the data required above is present in the documentation. The actual parser script is <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation/blob/parser/parser.js">here</a>.
+</p>
+<h2>JSON to .js</h2>
+<p>
+Once we have the JSON, a <a href="https://github.com/itsjoesullivan/digital-ocean-api-v2/blob/master/lib/factory.js">factory</a> converts a model to a function. Running each of the models through this process yields the actual library, which looks like:
+<pre><code class="js">api = {
+  droplets: {
+    createNewDroplet: [Function],
+    retrieveExistingDropletById: [Function]
+    ...
+  },
+  images: {
+    listAllImages: [Function],
+    retrieveExistingImageById: [Function]
+    ...
+  },
+  ...
+}</code></pre>
+<p>
+Each function returns a promise via <code>request-promise</code>.
+</p>
+<h2>From library to CLI</h2>
+<p>
+That's more or less the process. To use the API from the command line, there is <a href="https://github.com/itsjoesullivan/digital-ocean-wrench">digital-ocean-wrench</a> ( <code>npm install -g dow</code> ). It uses a <a href="https://github.com/itsjoesullivan/digital-ocean-wrench/blob/master/lib/method-map.json">map</a> to convert:
+<br />
+<pre>    <code>dow floating-ip create --region=nyc2</code></pre>
+<pre>        to</pre>
+<pre>    <code>api.floatingIPActions.createNewFloatingIPReservedToRegion({ region: "nyc2" })</code></pre>
+</p>
+<p>It uses <a href="https://github.com/bcoe/yargs">yargs</a>, which I found to be great.
+</p>
+<h2>More...</h2>
+<p>Working closely with this documentation, I noticed <a href="https://developers.digitalocean.com/documentation/v2/#delete-a-floating-ips">one pluralization error</a>, <a href="https://developers.digitalocean.com/documentation/v2/#list-neighbors-for-a-droplet">one instance</a> where a <code>PATH</code> is described unusually, <a href="https://developers.digitalocean.com/documentation/v2/#get-user-information">one action</a> that is simply not described at all, and a <a href="https://developers.digitalocean.com/documentation/v2/#assign-a-floating-ip-to-a-droplet">few</a> <a href="https://developers.digitalocean.com/documentation/v2/#unassign-a-floating-ip">places</a> where non-crucial data wasn't described in the standard way. Yet this is <b>good</b> documentation. This brings up the reality that API documentation doesn't usually meet the same quality standards as the code it describes, so it should be used with caution.
+</p>
+<p>
+Being capable of being used to generate a library seems like a pretty good characteristic of documentation. The only requirement to do that is for all the documentation to be presented in a straightforward, structured way. The benefit is that it makes generating complete libraries in different languages easy.
+</p>
+<p>
+How well does this method of library generation travel? A useful next step would be to survey other popular APIs and determine whether any have simple enough APIs and good enough documentation to give it a try. Perhaps some of the code present here could be re-used, though I'd like to emphasize that this method is still faster in terms of development time than implementing methods manually.
+</p>
+<p>To reiterate:
+<ul>
+  <li><a href="https://github.com/itsjoesullivan/digital-ocean-api-v2">JavaScript Digital Ocean API library</a>
+  </li>
+  <li>
+    <a href="https://github.com/itsjoesullivan/digital-ocean-wrench">Digital Ocean Wrench (CLI)</a>
+  </li>
+  <li>
+    <a href="https://github.com/itsjoesullivan/parsed-digital-ocean-api-documentation">Underlying parsed documentation</a>
+  </li>
+  <li>
+    <a href="https://developers.digitalocean.com/documentation/v2">The documentation itself</a>
+  </li>
+</ul>
+</p>
+</article>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-31945659-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script src="https://use.typekit.net/vtn6mfd.js"></script>
+<script src="https://use.typekit.net/vej1mbp.js"></script>
+<script>try{Typekit.load({ async: true });}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/googlecode.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
