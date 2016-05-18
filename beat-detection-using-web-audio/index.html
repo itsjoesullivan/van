@@ -12,38 +12,31 @@
     <link href="/images/favicon-16x16.png" rel="icon" type="image/png" />
     <link href="/stylesheets/code.css" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/screen.css" rel="stylesheet" type="text/css" />
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                              })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    <style>
+      article {
+        max-width: 800px;
+        margin: auto;
+        font-family: "minion-pro"
+      }
+      h1, h2, h3, h4 {
+        font-family: "myriad-pro", sans-serif;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
 
-      ga('create', 'UA-53953605-4', 'auto');
-      ga('send', 'pageview');
-    </script>
+      p {
+        font-size: 1.2em;
+      }
+    </style>
+    <script src="https://use.typekit.net/vej1mbp.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
   </head>
   <body>
 
-    <header class="header-main">
-  <div class="header-graphics" id="header-graphics"></div>
-  <div class="header-container">
-    <h1><a href="/"><img alt="Beatport Engineering" src="/images/beatport_engineering.svg" /></a></h1>
-    <nav class="header-nav">
-      <ul class="header-nav-list">
-        <li><a href="/archives">Articles</a></li>
-        <li><a href="/about-us">About us</a></li>
-        <li><a href="https://sfx.recruiterbox.com/">Careers</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
-
-
-    <div id="main" role="main">
         <article class="post single">
     <header>
       <h1>Beat Detection Using JavaScript and the Web Audio API</h1>
-      <h2 class="header-metadata">Posted by: <strong>Joe Sullivan</strong> on 2014/07/28 in <a href="/categories/web-audio">Web audio</a></h2>
     </header>
     <style>
   svg {
@@ -104,7 +97,7 @@
 
 </style>
 
-<p><img src="/images/joes-blog-thing.png" width="25%" class="image-summary" /> This article explores using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">Web Audio API</a> and JavaScript to accomplish beat detection in the browser. Let’s define beat detection as determining (1) the location of significant drum hits within a song in order to (2) establish a tempo, in beats per minute (BPM). </p>
+<p>This article explores using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">Web Audio API</a> and JavaScript to accomplish beat detection in the browser. Let’s define beat detection as determining (1) the location of significant drum hits within a song in order to (2) establish a tempo, in beats per minute (BPM). </p>
 
 <p>If you’re not familiar with using the WebAudio API and creating buffers, <a href="http://www.html5rocks.com/en/tutorials/webaudio/intro/">this tutorial will get you up to speed</a>. We’ll use <a href="http://www.beatport.com/release/go/1338457">Go</a> from <a href="http://www.beatport.com/artist/grimes/173967">Grimes</a> as our sample track for the examples below.</p>
 
@@ -2135,35 +2128,14 @@
 
 <p>There’s an interesting pattern present in <strong>wasted</strong>, <strong>midnight-city</strong>, and <strong>express-yourself</strong>: the two top tempo candidates are related by a ratio of 4/3, and the lower of the two is correct. In midnight-city, the two are tied, whereas in express-yourself the higher of the two knocks out the actual tempo for the top spot. Listening to each sample, they all have triplets in the drum section, which explains the presence of the higher ratio. The algorithm should be tweaked to identify this sympathetic tempos and fold their results into the lower of the two.</p>
 
-<p>However, this article has exhausted its scope. <strong>The bottom line is:</strong> <em>you can do pretty good beat detection using JavaScript, the Web Audio API, and a couple of rules of thumb.</em></p>
+<p>However, this article has exhausted its scope. The bottom line is: you can do pretty good beat detection using JavaScript, the Web Audio API, and a couple of rules of thumb.</p>
 
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
 
-    <section class="article-metadata">
-      <ul class="metadata-tags">
-        <li>Metadata:</li>
-          <li><a href="/tags/javascript">javascript</a></li>
-          <li><a href="/tags/web-audio">web-audio</a></li>
-          <li><a href="/tags/html5">html5</a></li>
-      </ul>
-      <div class="meta-link"><a class="meta-link-a" href="/">&larr; Back to homepage</a></div>
-    </section>
   </article>
 
-    </div>
 
-    <footer class="footer-main">
-  <h4><span>&copy; 2014 SFX Entertainment, all rights reserved</span></h4>
-  <nav>
-    <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/archives">Articles</a></li>
-      <li><a href="/about-us">About us</a></li>
-      <li><a href="https://sfx.recruiterbox.com/">Careers</a></li>
-    </ul>
-  </nav>
-</footer>
 
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
