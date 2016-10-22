@@ -22,15 +22,35 @@
       margin-bottom: 2em;
     }
     article {
+      margin-top: 3em;
       margin-bottom: 2em;
+    }
+    #author {
+      text-align: right;
+    }
+
+    #author img {
+      width: 90px;
+      vertical-align: middle;
+      margin-left: 1em;
+    }
+    h1 {
+      margin-bottom: 3px;
+    }
+    header {
+      margin-top: 1em;
     }
   </style>
   <title>React and Web Audio</title>
   <meta name="description" content="A method of using react alongside web audio that allows you to program how you want in each paradigm." />
 </head>
 <body>
+  <header><a href="http://joesul.li/van" style="font-family: monospace; margin-left: 3em;">joesul.li/van</a>
 <article>
-<h2>React + Web Audio</h2>
+<h1>React + Web Audio</h1>
+<div id="author">
+  by <a href="https://twitter.com/itsjoesullivan" target="_blank">Joe Sullivan</a> <img src="me.jpg"/>
+</div>
 
 <section>
 <p>
@@ -63,9 +83,12 @@ Let's start with an axiom, that web audio and react will be sharing the same sta
 It isn't possible / wouldn't make sense for the audio representation to contain the react representation, and I don't want to explore a situation where audio and react interact outside of messages to the state.
 </p>
 <p>
-I have created small projects that kept react and audio apart. For larger projects, maintaining simplicity is important, so I'd prefer to not have two top-level representations of the state. Luckily react is good at being your top-level container, so the approach I took here is the 2nd option listed above: react contains the audio representation. If audio lives inside of react, the markup must look something like:
+I have created small projects that kept react and audio apart. For larger projects, maintaining simplicity is important, so I'd prefer to not have two top-level representations of the state. Luckily react is good at being your top-level container, so the approach I took here is the 2nd option listed above: react contains the audio representation. If audio lives inside of react, the top-level component must look something like:
 </p>
-<a class="jsbin-embed" href="http://jsbin.com/bobegut/embed?html&height=160px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<a class="jsbin-embed" href="http://jsbin.com/bobegut/embed?js&height=230px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<p>
+<code>SynthEngine</code> would be where the audio-specific code lives. <code>SynthUI</code> and <code>OnscreenKeyboard</code> would be normal components.
+</p>
 </section>
 
 <section>
@@ -104,7 +127,9 @@ Now all we need to get things going is to actually trigger an event. Let's look 
 <h2>Put it together</h2>
 <p>Let's turn the above into a working app:</p>
 <a class="jsbin-embed" href="http://jsbin.com/tudefoz/embed?output&height=150px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
-<p>Click on the icon at the top left to open this in a new page if you want to make this easier to read. Note that I switch from a simple object state to an Immutable.js Map. This keeps the time spent in the reducer down, which is very important if you're going to be placing react in between your input events and the sound engine.</p>
+<p>
+To read the source code, click on the icon at the top left. Note that I switch from a simple object state to an Immutable.js Map. This keeps the time spent in the reducer down, which is very important if you're going to be placing react in between your input events and the sound engine.
+</p>
 </section>
 <section>
 <h2>Performance</h2>
