@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    article {
+      max-width: 600px;
+      margin: auto;
+    }
+    p {
+      font-size: 1.1em;
+      line-height: 1.7em;
+      text-indent: 2em;
+    }
+    li {
+      font-size: 1.1em;
+      line-height: 1.7em;
+    }
+    section {
+      margin-bottom: 2em;
+    }
+    article {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+<article>
+<h2>React + Web Audio</h2>
+
+<section>
+<p>
+This article lays out the current approach that <a href="https://scat.io">scat.io</a> employs to use React alongside Web Audio. It specifically uses redux, but I think the pattern would work fine without it.
+</p>
+<p>
+React is great because you get to lay out how your application state maps to HTML, then you can simply worry about modifying your state with the expectation that React will render it correctly. Mentally you can imagine that every time something changes, React wipes out your old HTML and replaces it with new HTML.
+</p>
+<p>Web Audio is largely about scheduling events in the future. While I am not sure whether XML can represent these events in a straightforward way, I am not going to attempt it here. I pretty much like the event-scheduling nature of audio scheduling and don't want to tamper with it.
+</p>
+<p>
+So we're left with a conflict: react is declarative, and web audio is event-driven. How should we get these paradigms to work together?
+</p>
+</section>
+
+<section>
+<h2>Relationship</h2>
+<p>
+Let's start with an axiom, that web audio and react will be sharing the same state. Given that, there are a limited number of ways the state, the react representation, and the web audio representation can relate:
+<ul>
+  <li>
+  Audio and react run in parallel and aren't aware of one another
+  </li>
+  <li>
+  The react representation of the app somehow contains the audio representation
+  </li>
+</ul>
+</p>
+<p>
+It isn't possible / wouldn't make sense for the audio representation to contain the react representation, and I don't want to explore a situation where audio and react interact outside of messages to the state.
+</p>
+<p>
+I have created small projects that kept react and audio apart. For larger projects, maintaining simplicity is important, so I'd prefer to not have two top-level representations of the state. Luckily react is good at being your top-level container, so the approach I took here is the 2nd option listed above: react contains the audio representation. If audio lives inside of react, the markup must look something like:
+</p>
+<a class="jsbin-embed" href="http://jsbin.com/bobegut/embed?html&height=160px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+</section>
+
+<section>
+<h2>Getting to events</h2>
+<p>
+That markup is well and good for the react side of things. <code>SynthUI</code> and <code>OnscreenKeyboard</code> will be straightforward react components. But what do we need to do in order to be able to write <code>SynthEngine</code> using those events we like?
+</p>
+<a class="jsbin-embed" href="http://jsbin.com/mayisip/embed?js&height=650px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<p>
+The class definition above defines <code>SynthEngine</code> in a way that simply moves it away from declarative state (most of which usually resides in the render function) and into the processEvent method. What goes on inside processEvent is likely to be scheduling of audio events, and of course this logic can be imported from elsewhere.
+</p>
+<p>
+Event scheduling is not the only audio task we have: we still need to set up the audio graph that we are scheduling events around. In this example there is hardly any of that, but it does use componentWillMount and componentWillUnmount to create and close the AudioContext.
+</p>
+<h2>Supporting events</h2>
+<p>
+We have markup for react containing a sound engine, and we have a class definition that lets us easily process events. What do we need in-between to populate that events array?
+</p>
+<p>
+Here we wade into redux territory, but it should be fairly easy to adapt. Let's start by defining a state and reducer. Our app will have a visual keyboard and an audio synthesizer. So our store needs to keep track of which keys are currently being pressed and provide an events array for consumption by SynthEngine:
+</p>
+<a class="jsbin-embed" href="http://jsbin.com/qapuje/embed?js&height=560px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<p>
+Note that when processing events, the reducer can have two changes to make: first updating the state in any permanent way, then pushing the event into the event queue for processing.
+</p>
+</section>
+
+<section>
+<h2>Triggering events</h2>
+<p>
+Now all we need to get things going is to actually trigger an event. Let's look at OnscreenKeyboard:
+</p>
+<a class="jsbin-embed" href="http://jsbin.com/batidix/embed?js&height=900px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+</section>
+<section>
+<h2>Put it together</h2>
+<p>Let's turn the above into a working app:</p>
+<a class="jsbin-embed" href="http://jsbin.com/tudefoz/embed?output&height=150px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<p>Click on the icon at the top left to open this in a new page if you want to make this easier to read. Note that I switch from a simple object state to an Immutable.js Map. This keeps the time spent in the reducer down, which is very important if you're going to be placing react in between your input events and the sound engine.</p>
+</section>
+<section>
+<h2>Performance</h2>
+<p>
+One of my concerns placing the audio scheduling work within the react lifecycle was performance. React's core use case is to quickly handle general, visual UI updates, where 60 fps is considered great. But how much overhead does react create when trying to run events through it? As it turns out, it doesn't need to add much:
+</p>
+<p>
+Below is the top bit of a flame chart from Chrome dev tools. The first section is a <code>NOTE_ON</code> event, the second is a <code>NOTE_OFF</code> event. Each took less than 2ms to complete here, meaning that we could handle up to 500 events per second.
+</p>
+
+<img src="flame.png" style="width: 80%; margin: auto; display: block; margin-top: 1em; border: 1px solid #ccc;"/>
+<p>
+The latency is even less than that because the SoundEngine is not the last component being processed. Here's a closer look at an event. It takes just 0.7ms for the event to get through the SoundEngine. The rest is spent processing the keyboard component and dealing with clearing the event queue.
+</p>
+<img src="flame-ii.png" style="width: 80%; margin: auto; display: block; margin-top: 1em; border: 1px solid #ccc;"/>
+<p>It's still possible that this setup won't provide enough throughput for all audio applications, but for my needs it is sufficient.</p>
+</section>
+<section>
+<h2>Wrap up</h2>
+<p>
+This app architecture provides a lot of the things I want: a react-based UI, audio-related events as essentially first-class citizens, fast performance, a single state, and it is all well-contained.
+</p>
+<p>
+In terms of scaling the application up, you could create UI and audio representations of each of your audio components. The audio sections would each listen to the event queue, perhaps subscribing to their own channel of events. Similar to MIDI.
+</p>
+<p>
+Or, you could place your entire routing logic within a general <code>SoundEngine</code> component.
+</p>
+<p>
+I realize that this write-up doesn't provide any input on how to actually write your audio scheduling code. My goal was just to deal with the interaction between audio and react, and this method is how I've chosen to do that for now.
+</p>
+</section>
+
+
+</article>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-31945659-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+</body>
+</html>
