@@ -102,7 +102,7 @@ That markup is well and good for the react side of things. But what do we need t
 </p>
 <a class="jsbin-embed" href="http://jsbin.com/mayisip/embed?js&height=700px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 <p>
-The class definition above defines <code>SynthEngine</code> in a way that channels the events out of the state into the <code>processEvent</code> method during the <code>componentWillUpdate</code> . What goes on inside <code>processEvent</code> is likely to be scheduling of audio events, and of course this logic can be imported from elsewhere.
+The class definition above defines <code>SynthEngine</code> in a way that channels the events out of the store and into the <code>processEvent</code> method during the <code>componentWillUpdate</code> . What goes on inside <code>processEvent</code> is likely to be scheduling of audio events, and of course this logic can be imported from elsewhere.
 </p>
 <p>
 Event scheduling is not the only audio task we have: we still need to set up the audio graph that we are scheduling events around. In this example there is hardly any of that, but it does use <code>componentWillMount</code> and <code>componentWillUnmount</code> to create and close the <code>AudioContext</code>. This could be where other audio nodes are setup and connected.
@@ -114,14 +114,14 @@ Event scheduling is not the only audio task we have: we still need to set up the
 We have markup for react containing a sound engine, and we have a class definition that lets us easily process events. What do we need in-between to populate that events array?
 </p>
 <p>
-Here we wade into redux territory, but it should be fairly easy to adapt. Let's start by defining a store and reducer. Our app will have a visual keyboard and an audio synthesizer. So our store needs to keep track of which keys are currently being pressed and provide an events array for consumption by <code>SynthEngine</code>:
+Here we wade into redux territory, but it should be fairly easy to adapt this pattern to your own code. Let's start by defining a store and reducer. Our app will have a visual keyboard and an audio synthesizer. So our store needs to keep track of which keys are currently being pressed and provide an events array for consumption by <code>SynthEngine</code>:
 </p>
 <a class="jsbin-embed" href="http://jsbin.com/qapuje/embed?js&height=560px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 <p>
 Note that when processing events, the reducer will often have two changes to make: first updating the state in any permanent way, then pushing the event into the event queue for processing.
 </p>
 <p>
-<code>SynthEngine</code> will also send <code>CLEAR_EVENT_QUEUE</code> actions, which will clear the event queue. When writing UI code, we'll want to avoid rendering on changes like that.
+<code>SynthEngine</code> sends <code>CLEAR_EVENT_QUEUE</code> actions, which clear the event queue. When writing UI code, we'll want to avoid rendering on changes like that.
 </p>
 </section>
 
@@ -130,7 +130,7 @@ Note that when processing events, the reducer will often have two changes to mak
 <p>
 Now all we need to get things going is to actually trigger an event. Let's look at <code>OnscreenKeyboard</code>:
 </p>
-<a class="jsbin-embed" href="http://jsbin.com/batidix/embed?js&height=720px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<a class="jsbin-embed" href="http://jsbin.com/batidix/embed?js&height=730px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 </section>
 <section>
 <h2>Put it together</h2>
