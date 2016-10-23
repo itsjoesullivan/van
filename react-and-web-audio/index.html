@@ -12,12 +12,12 @@
     }
     p {
       font-size: 1.1em;
-      line-height: 1.7em;
+      line-height: 1.6em;
       text-indent: 2em;
     }
     li {
       font-size: 1.1em;
-      line-height: 1.7em;
+      line-height: 1.6em;
     }
     section {
       margin-bottom: 2em;
@@ -55,12 +55,12 @@
 
 <section>
 <p>
-This article lays out the current approach that <a href="https://scat.io">scat.io</a> employs to use React alongside Web Audio. It specifically uses redux, but I think the pattern would work fine without it.
+This article lays out the current approach that <a href="https://scat.io">scat.io</a> employs to use React alongside Web Audio. It specifically uses Redux, but I think the pattern would work fine without it.
 </p>
 <p>
-React is great because you get to lay out how your application state maps to HTML, then you can simply worry about modifying your state with the expectation that React will render it correctly. Mentally you can imagine that every time something changes, React wipes out your old HTML and replaces it with new HTML.
+React is great because it lets you lay out how your application state maps to HTML, then you can worry about modifying your state with the expectation that react will render it correctly. Mentally you can imagine that every time something changes, react wipes out your old HTML and replaces it with new HTML.
 </p>
-<p>Web Audio is largely about scheduling events in the future. While I am not sure whether XML can represent these events in a straightforward way, I am not going to attempt it here. I pretty much like the event-scheduling nature of audio scheduling and don't want to tamper with it.
+<p>Web audio is largely about scheduling events in the future. While I am not sure whether XML can represent these events in a straightforward way, I am not going to attempt it here. I pretty much like the event-scheduling nature of audio scheduling and don't want to tamper with it.
 </p>
 <p>
 So we're left with a conflict: react is declarative, and web audio is event-driven. How should we get these paradigms to work together?
@@ -70,7 +70,7 @@ So we're left with a conflict: react is declarative, and web audio is event-driv
 <section>
 <h2>Relationship</h2>
 <p>
-Let's start with an axiom, that web audio and react will be sharing the same state. Given that, there are a limited number of ways the state, the react representation, and the web audio representation can relate:
+Let's just assume that web audio and react will be representing the same state. Given that, there are a limited number of ways the state, the react representation, and the web audio representation can relate:
 <ul>
   <li>
   Audio and react run in parallel and aren't aware of one another
@@ -81,12 +81,15 @@ Let's start with an axiom, that web audio and react will be sharing the same sta
 </ul>
 </p>
 <p>
-It isn't possible / wouldn't make sense for the audio representation to contain the react representation, and I don't want to explore a situation where audio and react interact outside of messages to the state.
+It isn't possible and wouldn't make sense for the audio representation to contain the react representation, and I don't want to explore a situation where audio and react interact outside of messages to the state.
 </p>
 <p>
-I have created small projects that kept react and audio apart. For larger projects, maintaining simplicity is important, so I'd prefer to not have two top-level representations of the state. Luckily react is good at being your top-level container, so the approach I took here is the 2nd option listed above: react contains the audio representation. If audio lives inside of react, the top-level component must look something like:
+I have created small projects that kept react and audio apart. However, for larger projects, maintaining simplicity is important, so I'd prefer to not have two top-level representations of the state. Luckily react is good at being your top-level container, so the approach I took here is the 2nd option listed above: react contains the audio representation.
 </p>
-<a class="jsbin-embed" href="http://jsbin.com/bobegut/embed?js&height=230px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<p>
+If audio lives inside of react, the top-level component must look something like:
+</p>
+<a class="jsbin-embed" href="http://jsbin.com/bobegut/embed?js&height=220px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 <p>
 <code>SynthEngine</code> would be where the audio-specific code lives. <code>SynthUI</code> and <code>OnscreenKeyboard</code> would be normal components.
 </p>
@@ -95,69 +98,74 @@ I have created small projects that kept react and audio apart. For larger projec
 <section>
 <h2>Getting to events</h2>
 <p>
-That markup is well and good for the react side of things. <code>SynthUI</code> and <code>OnscreenKeyboard</code> will be straightforward react components. But what do we need to do in order to be able to write <code>SynthEngine</code> using those events we like?
+That markup is well and good for the react side of things. But what do we need to do in order to be able to write <code>SynthEngine</code> using those events we like?
 </p>
-<a class="jsbin-embed" href="http://jsbin.com/mayisip/embed?js&height=650px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<a class="jsbin-embed" href="http://jsbin.com/mayisip/embed?js&height=700px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 <p>
-The class definition above defines <code>SynthEngine</code> in a way that simply moves it away from declarative state (most of which usually resides in the render function) and into the processEvent method. What goes on inside processEvent is likely to be scheduling of audio events, and of course this logic can be imported from elsewhere.
+The class definition above defines <code>SynthEngine</code> in a way that channels the events out of the state into the <code>processEvent</code> method during the <code>componentWillUpdate</code> . What goes on inside <code>processEvent</code> is likely to be scheduling of audio events, and of course this logic can be imported from elsewhere.
 </p>
 <p>
-Event scheduling is not the only audio task we have: we still need to set up the audio graph that we are scheduling events around. In this example there is hardly any of that, but it does use componentWillMount and componentWillUnmount to create and close the AudioContext.
+Event scheduling is not the only audio task we have: we still need to set up the audio graph that we are scheduling events around. In this example there is hardly any of that, but it does use <code>componentWillMount</code> and <code>componentWillUnmount</code> to create and close the <code>AudioContext</code>. This could be where other audio nodes are setup and connected.
 </p>
+</section>
+<section>
 <h2>Supporting events</h2>
 <p>
 We have markup for react containing a sound engine, and we have a class definition that lets us easily process events. What do we need in-between to populate that events array?
 </p>
 <p>
-Here we wade into redux territory, but it should be fairly easy to adapt. Let's start by defining a state and reducer. Our app will have a visual keyboard and an audio synthesizer. So our store needs to keep track of which keys are currently being pressed and provide an events array for consumption by SynthEngine:
+Here we wade into redux territory, but it should be fairly easy to adapt. Let's start by defining a store and reducer. Our app will have a visual keyboard and an audio synthesizer. So our store needs to keep track of which keys are currently being pressed and provide an events array for consumption by <code>SynthEngine</code>:
 </p>
 <a class="jsbin-embed" href="http://jsbin.com/qapuje/embed?js&height=560px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 <p>
-Note that when processing events, the reducer can have two changes to make: first updating the state in any permanent way, then pushing the event into the event queue for processing.
+Note that when processing events, the reducer will often have two changes to make: first updating the state in any permanent way, then pushing the event into the event queue for processing.
+</p>
+<p>
+<code>SynthEngine</code> will also send <code>CLEAR_EVENT_QUEUE</code> actions, which will clear the event queue. When writing UI code, we'll want to avoid rendering on changes like that.
 </p>
 </section>
 
 <section>
 <h2>Triggering events</h2>
 <p>
-Now all we need to get things going is to actually trigger an event. Let's look at OnscreenKeyboard:
+Now all we need to get things going is to actually trigger an event. Let's look at <code>OnscreenKeyboard</code>:
 </p>
-<a class="jsbin-embed" href="http://jsbin.com/batidix/embed?js&height=900px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
+<a class="jsbin-embed" href="http://jsbin.com/batidix/embed?js&height=720px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 </section>
 <section>
 <h2>Put it together</h2>
 <p>Let's turn the above into a working app:</p>
 <a class="jsbin-embed" href="http://jsbin.com/tudefoz/embed?output&height=150px">JS Bin on jsbin.com</a><script src="https://static.jsbin.com/js/embed.min.js?3.39.20"></script>
 <p>
-To read the source code, click on the icon at the top left. Note that I switch from a simple object state to an Immutable.js Map. This keeps the time spent in the reducer down, which is very important if you're going to be placing react in between your input events and the sound engine.
+To read the source code, click on the icon at the top left. Note that I switch from a simple object state to an Immutable.js <code>Map</code>. This keeps the time spent in the reducer down, which is very important if you're going to be placing react in between your input events and the sound engine.
 </p>
 </section>
 <section>
 <h2>Performance</h2>
 <p>
-One of my concerns placing the audio scheduling work within the react lifecycle was performance. React's core use case is to quickly handle general, visual UI updates, where 60 fps is considered great. But how much overhead does react create when trying to run events through it? As it turns out, it doesn't need to add much:
+One of my concerns placing the audio scheduling work within the react lifecycle was performance. React's core use case is to quickly handle general, visual UI updates, where 60 fps is considered sufficient. That's not to say that react has a speed limit. However, I did want to know how much overhead react adds when running events through it. As it turns out, it doesn't need to add much:
 </p>
 <p>
 Below is the top bit of a flame chart from Chrome dev tools. The first section is a <code>NOTE_ON</code> event, the second is a <code>NOTE_OFF</code> event. Each took less than 2ms to complete here, meaning that we could handle up to 500 events per second.
 </p>
 
-<img src="flame.png" style="width: 80%; margin: auto; display: block; margin-top: 1em; border: 1px solid #ccc;"/>
+<img alt="Flame chart" src="flame.png" style="width: 80%; margin: auto; display: block; margin-top: 1em; border: 1px solid #ccc;"/>
 <p>
-The latency is even less than that because the SoundEngine is not the last component being processed. Here's a closer look at an event. It takes just 0.7ms for the event to get through the SoundEngine. The rest is spent processing the keyboard component and dealing with clearing the event queue.
+The latency is even less than that, though, because the <code>SoundEngine</code> is not the last component being processed. Here's a closer look at an event. It takes just 0.7ms to get from the DOM event to having scheduled the audio event. The rest is spent processing the keyboard component and dealing with clearing the event queue.
 </p>
-<img src="flame-ii.png" style="width: 80%; margin: auto; display: block; margin-top: 1em; border: 1px solid #ccc;"/>
+<img alt="Flame chart close-up" src="flame-ii.png" style="width: 80%; margin: auto; display: block; margin-top: 1em; border: 1px solid #ccc;"/>
 <p>It's still possible that this setup won't provide enough throughput for all audio applications, but for my needs it is sufficient.</p>
 </section>
 <section>
 <h2>Wrap up</h2>
 <p>
-This app architecture provides a lot of the things I want: a react-based UI, audio-related events as essentially first-class citizens, fast performance, a single state, and it is all well-contained.
+This app architecture provides a lot of the things that I wanted: a react-based UI, audio-related events as essentially first-class citizens, fast performance, a single state, and it is all well-contained.
 </p>
 <p>
 In terms of scaling the application up, you could create UI and audio representations of each of your audio components. The audio sections would each listen to the event queue, perhaps subscribing to their own channel of events. Similar to MIDI.
 </p>
 <p>
-Or, you could place your entire routing logic within a general <code>SoundEngine</code> component.
+Or, you could place your entire routing logic within a general <code>SoundEngine</code> component, routing the events it receives as you please.
 </p>
 <p>
 I realize that this write-up doesn't provide any input on how to actually write your audio scheduling code. My goal was just to deal with the interaction between audio and react, and this method is how I've chosen to do that for now.
