@@ -5,12 +5,22 @@
 <meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="style.css" />
 <title>Synthesizing Hi-Hats with Web Audio</title>
+<style>
+article {
+max-width: 600px;
+margin: auto;
+font-family: sans-serif;
+}
+header {
+font-family: monospace;
+}
+</style>
 </head>
 <body>
 <header>
 <a href="http://joesul.li/van">joesul.li/van</a>
 </header>
-<article style="max-width:800px;margin:auto;">
+<article>
   <h1>Synthesizing Hi-Hats with Web Audio</h1>
   <p class="byline">By <a href="https://twitter.com/itsjoesullivan" target="_blank">Joe Sullivan</a></p>
   <!--center><img src="graph.png" style="width: 50%;padding:1em;"/></center>
@@ -65,9 +75,9 @@
       var now = context.currentTime;
 
       osc.start(now);
-      osc.stop(now + 0.2);
+      osc.stop(now + 0.4);
       gain.gain.value = 0.1;
-      gain.gain.exponentialRampToValueAtTime(0.000001, now + 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.000001, now + 0.26);
     });
   </script>
   <p>Yeah... so, somehow six of those will turn into a hi-hat?<p>
@@ -104,12 +114,12 @@
         osc.frequency.value = fundamental * ratio;
         osc.connect(gain);
         osc.start(when);
-        osc.stop(when + 0.2);
+        osc.stop(when + 0.3);
         return osc;
       });
       gain.connect(context.destination);
       gain.gain.value = 0.1;
-      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);
     });
   </script>
   <pre class="example"><code class="javascript">var $inputs = $("#six-square-calculator input[type=number]");
@@ -166,7 +176,7 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);</code></pre>
       bandpass.connect(gain);
       gain.connect(context.destination);
       gain.gain.value = 0.6;
-      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);
     });
   </script>
   <p>Crazily enough the sound is starting to get there. It's still plenty clear that there are synths underneath the sound, but I can hear this as a percussive hit rather than a musical tone. Now let's refine the envelope a little bit:</p>
@@ -196,8 +206,8 @@ gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.1);</code></pre>
       gain.connect(context.destination);
       gain.gain.value = 0;
       gain.gain.setValueAtTime(0.00001, when);
-      gain.gain.exponentialRampToValueAtTime(1, when + 0.02);
-      gain.gain.exponentialRampToValueAtTime(1/3, when + 0.03);
+      gain.gain.exponentialRampToValueAtTime(1/2, when + 0.02);
+      gain.gain.exponentialRampToValueAtTime(1/6, when + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.00001, when + 0.3);
     });
   </script>
