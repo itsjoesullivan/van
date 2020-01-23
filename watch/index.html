@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width">
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@itsjoesullivan" />
+<meta name="twitter:title" content="Digital watch with a rotary crown" />
+<meta name="twitter:image" content="http://joesul.li/van/watch/hero-pic.jpg" />
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+	line-height: 1.3em;
+	font-size: 1.1em;
+}
+html {
+	margin: 20px;
+}
+body {
+	margin: auto;
+	width: 600px;
+}
+
+@media only screen and (max-width: 600px) {
+	body {
+		width: 100%;
+	}
+}
+
+p {
+//	text-indent: 3em;
+}
+img, video {
+	max-width: 100%;
+}
+img.piece {
+	width: 30%;
+	margin: 0;
+	padding: 0;
+}
+img.programmer {
+	width: 49%;
+}
+img.steps {
+	width: 60%;
+	display: block;
+	margin: auto;
+}
+img.series {
+	width: 30%;
+}
+</style>
+</head>
+<body>
+<h1>Building a watch</h1>
+<span>Joe Sullivan - January 22, 2020</span>
+<br />
+<br />
+<!--img src="01.jpg" /-->
+<img src="hero-pic.jpg" />
+<p>
+This past summer I started building a watch. My idea was to combine a simple digital watch display with a nice watch case. Though it was more involved than I anticipated, it's finally fairly complete!
+</p>
+<h3>The digital crown</h3>
+<p>
+The toughest challenge with this watch was finding a way to use the traditional rotating crown to set the digital time on the watch.</p>
+</p>
+<video controls muted loop>
+  <source src="hero-i.mp4" type="video/mp4" >
+Your browser does not support the video tag.
+</video>
+<p>
+After a great deal of experimenting, I attached a magnetic rotation sensor to the PCB and a magnet to the stem (the metal rod extending from the crown), which made it possible to digitize the rotation of the crown. Because watches must be very energy efficient, and because the magnetic sensor requires power, there is a <a href="https://en.wikipedia.org/wiki/Reed_switch" target="_blank">reed switch</a> that closes when the crown is extended, and only then is the sensor activated. This also provides a way to "set" the time, by inserting the crown and disabling the sensor.
+</p>
+<img src="magnet-01-small.jpg" />
+<img src="alt-hall.jpg" />
+<span><i>Alternate view of the magnetic sensor</i></span>
+<hr />
+<p>
+You might notice that the sensor is mounted perpendicular to the PCB. I wasn't able to find any rotational magnetic sensor in a small enough package that didn't require the magnet to be directly above it -- and because the crown could only come from one direction, that meant mounting it perpendicular to the main PCB.
+</p>
+<img class="piece" src="piece-a.jpg" />
+<img class="piece" src="piece-b.jpg" />
+<img class="piece" src="piece-c.jpg" />
+<img class="piece" src="piece-d.jpg" />
+<img class="piece" src="piece-e.jpg" />
+<img class="piece" src="piece-f.jpg" />
+<img class="piece" src="piece-g.jpg" />
+<br />
+<span><i>The steps of mounting the second board. Forgive the last image - I think I've done better soldering jobs on that section since.</i></span>
+<br />
+<p>
+The solution was to create a second, tiny PCB that would fit into a slot on the main board. A combination of the slot and solder then hold the second board in place. This piece could be printed along with the primary circuit board thanks to existing slot in the PCB required for the watch stem.
+</p>
+<!--h3>PCB</h3>
+<p>I'm not very experienced in PCB design, so it was a long process designing and refining a PCB that would satisfy my circuit and mechanical needs. Here's a little video of the various iterations of the PCB, taken from my JLCPCB account:</p>
+<video controls muted loop>
+  <source src="vid-1.mp4" type="video/mp4" >
+Your browser does not support the video tag.
+</video-->
+<h2>Development process</h2>
+<p>I began this project without much hardware experience, so it took many steps to get to a functional watch.</p>
+<h4>A - Arduindo</h4>
+<img class="steps" src="a.jpg" />
+<p>The first step was building a "clock" using an arduino board, a 4-digit LED display, and an encoder. It was huge, used a lot of power, and wasn't accurate, but it was a clock!</p>
+<h4>B - Microchip</h4>
+<img class="steps" src="b.jpg" />
+<p>I decided to try skipping the Arduino layer and go straight to the Microchip programming environment, which would set me up for using whichever chip I wanted and allow me to take advantage of the chip's LCD drivers (which are a whole lot more complicated than driving LED displays because they rely on AC current). This was a fateful choice - it gave me more flexibility, but meant skipping all of the support of the Arduino community.</p>
+<h4>C - LCD</h4>
+<img class="steps" src="c.jpg" />
+<p>Once I had tested programming a board using Microchip's MPLab X IDE, I sourced a suitable LCD and put together a third "clock". It's not accurate or small, but its power consumption is nice and low. (It's still running on its original batteries!)</p>
+<h4>D - Quartz</h4>
+<img class="steps" src="d.jpg" />
+<p>Finally, I picked up a quartz crystal and managed to hook it up and configure it correctly, yielding a roughly accurate, low-power clock! (Still large, though). Note the PCB - this was my first experience designing a board through JLCPCB, and it was an encouraging experience.</p>
+<h4>And so on...</h4>
+<p>At this point, my primary need was to shrink the PCB to fit inside of a <a href="http://www.ofrei.com/page460.html" target="_blank">watch case</a>.</p><img class="series" src="s-a.png" />
+<img class="series" src="s-b.png" />
+<img class="series" src="s-c.png" />
+<img class="series" src="s-d.png" />
+<img class="series" src="s-e.png" />
+<img class="series" src="s-f.png" />
+<p>The design went through a series of iterations, each testing out different requirements, from a round PCB, to a slot in a PCB, to a sub-board embedded within the PCB, and finally to a notch in the circular PCB to latch it into the watch case.</p>
+
+<h2>Miscellaneous</h2>
+<h3>Power considerations</h3>
+<p>
+Ultimately I was able to put a 40mAh battery in the watch.
+I used the PIC16LF1936 microchip, which can run on an external crystal at 600nA. The LCD display uses some additional power, but the watch spends most of its time only concerned with those two components. I haven't been able to make accurate measurements yet, but my voltmeter reports that it consumes around 10 microamps generally. This gives me at least half of a year on a battery (and I suspect much more).
+</p>
+<p>
+The magnetic sensor uses about 3mA, and when setting the clock the chip is not put into sleep mode, so you wouldn't want to leave the watch with the crown out overnight.
+</p>
+<h3>Sensor reading</h3>
+<p>In order to keep complexity down, I sought out a rotation sensor that provided an analog output. <a href="https://www.mouser.com/datasheet/2/15/HGARAN008A_data-1500087.pdf" target="_blank">This</a> sensor from ALPS does just that, outputting two signals: the sine and cosine of the rotation angle:
+<img src="sensor-diagram.png" />
+<p>The atan2 function returns those values to the angle:</p>
+<pre>
+<code>
+int getCurrentMinPosition(void) {
+
+    adc_result_t vA = ADC_GetConversion(channel_AN0) / 10;
+    adc_result_t vB = ADC_GetConversion(channel_AN1) / 10;
+
+    double nA = ((vA - vAMin) / (vAMax - vAMin) * 2 - 1;
+    double nB = ((vB - vBMin) / (vBMax - vBMin) * 2 - 1;
+    double atan2Reading = atan2(nB, nA);
+    int deg = (atan2Reading + PI) / (2 * PI) * 360;
+    int min = deg / 6;
+    currentMinPosition = min;
+    return min;
+
+}
+</code>
+</pre>
+<h3>Gallery</h3>
+<video controls muted loop>
+  <source src="reed-tester.mp4" type="video/mp4" >
+Your browser does not support the video tag.
+</video>
+<p>Hacked together device for testing reed switches and magnets.</p>
+<hr />
+<img src="solder-station.jpg" />
+<p>A few important tools made this possible. A hot air soldering station was essential for soldering the smaller parts, and a very fine-tipped iron came in handy.</p>
+<hr />
+<img class="programmer" src="microchip.jpg" />
+<img class="programmer" src="connection.jpg" />
+<p>Although I began the project using Arduino, I ended up using the Microchip MPLAB programming environment, using the PICKit 4 programmer, which made it pretty easy to program the microprocessor. The second image is of the connection between the programmer and the PCB.</p>
+<hr />
+<img src="workshop.jpg" />
+<p>It was hard to stay organized.</p>
+<hr />
+<center><img style="width:60%;" src="final-look.jpg" /></center>
+<p>Another view of the watch - note the notch at the bottom left, holding the PCB into what is called the "movement ring".</p>
+</body>
+</html>
